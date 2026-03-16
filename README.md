@@ -191,13 +191,13 @@ For security vulnerabilities, do not open a public issue. See [SECURITY.md](SECU
 
 Join [AI Marketing Hub Pro](https://www.skool.com/ai-marketing-hub-pro/about?ref=59f96e9d9f2b4047b53627692d8c8f0c) for access to exclusive projects and the community behind this tool (referral link).
 
-**Other projects:**
+## Other Projects
 
-> **[gemini-seo](https://github.com/avalonreset/gemini-seo)** - 14 professional SEO workflows for Gemini CLI. Technical audits, schema markup, Core Web Vitals, E-E-A-T, and AI search readiness. No subscriptions, no cloud.
-
-> **[codex-seo](https://github.com/avalonreset/codex-seo)** - Same firepower, built for Codex CLI. 12 workflows, 6 parallel agents, client-ready HTML/PDF reports from your terminal.
-
-> **[BenjaminTerm](https://github.com/avalonreset/BenjaminTerm)** - Hacker-styled WezTerm distribution for Windows. Smart clipboard, paste undo, 86 curated dark themes with shuffle-bag rotation, borderless glass mode.
+| Project | Description |
+|---------|-------------|
+| [gemini-seo](https://github.com/avalonreset/gemini-seo) | 14 professional SEO workflows for Gemini CLI. Technical audits, schema markup, Core Web Vitals, E-E-A-T, and AI search readiness. |
+| [codex-seo](https://github.com/avalonreset/codex-seo) | Same firepower, built for Codex CLI. 12 workflows, 6 parallel agents, client-ready HTML/PDF reports from your terminal. |
+| [BenjaminTerm](https://github.com/avalonreset/BenjaminTerm) | Hacker-styled WezTerm distribution for Windows. Smart clipboard, paste undo, 86 curated dark themes, borderless glass mode. |
 
 ## License
 
