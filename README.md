@@ -1,4 +1,6 @@
-<!-- TODO: Add banner image -->
+<p align="center">
+  <img src="assets/banner.webp" alt="Wan2GP Operator - open source CLI operator for Wan2GP text-to-video generation with headless batch execution and AI music video pipeline" width="100%">
+</p>
 
 # Wan2GP Operator - Open Source Text-to-Video CLI
 
