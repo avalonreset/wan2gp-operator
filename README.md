@@ -189,6 +189,8 @@ For bugs and feature requests, [open an issue](https://github.com/avalonreset/wa
 
 For security vulnerabilities, do not open a public issue. See [SECURITY.md](SECURITY.md).
 
+Join [AI Marketing Hub Pro](https://www.skool.com/ai-marketing-hub-pro/about?ref=59f96e9d9f2b4047b53627692d8c8f0c) for access to exclusive projects and the community behind this tool (referral link).
+
 ## License
 
 MIT License. See [LICENSE](LICENSE).
