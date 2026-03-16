@@ -1,5 +1,9 @@
 # Wan2GP Operator
 
+[![CI](https://github.com/avalonreset/wan2gp-operator-skill/actions/workflows/ci.yml/badge.svg)](https://github.com/avalonreset/wan2gp-operator-skill/actions/workflows/ci.yml)
+[![Version](https://img.shields.io/github/v/release/avalonreset/wan2gp-operator-skill)](https://github.com/avalonreset/wan2gp-operator-skill/releases)
+[![License](https://img.shields.io/github/license/avalonreset/wan2gp-operator-skill)](LICENSE)
+
 Codex-native command center for Wan2GP.
 
 Stop babysitting sliders. Stop guessing memory limits. Stop burning runs on broken settings.
