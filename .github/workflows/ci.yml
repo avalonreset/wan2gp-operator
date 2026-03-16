@@ -1,0 +1,29 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Compile check
+        run: |
+          python -c "
+          from pathlib import Path
+          import py_compile
+          scripts = sorted(Path('scripts').glob('*.py'))
+          for s in scripts:
+              py_compile.compile(str(s), doraise=True)
+          print(f'Compiled {len(scripts)} scripts.')
+          "
+      - name: Help check
+        run: |
+          python scripts/wan2gp_operator.py --help

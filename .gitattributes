@@ -1,0 +1,8 @@
+# GitHub Linguist overrides for accurate language detection
+
+# Normalize line endings
+* text=auto
+
+# Generated/vendored files (excluded from language stats)
+*.min.js linguist-generated
+*.min.css linguist-generated
