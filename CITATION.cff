@@ -1,0 +1,18 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below."
+type: software
+title: "Wan2GP Operator"
+version: "0.3.0"
+date-released: "2026-02-15"
+authors:
+  - given-names: "Benjamin"
+    alias: "avalonreset"
+url: "https://github.com/avalonreset/wan2gp-operator-skill"
+repository-code: "https://github.com/avalonreset/wan2gp-operator-skill"
+license: "MIT"
+keywords:
+  - ai-video
+  - text-to-video
+  - wan2gp
+  - codex-skill
+  - video-generation
