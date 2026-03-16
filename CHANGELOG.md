@@ -57,8 +57,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 - Bootstrap, compose, run, diagnose, updates, evolve workflows
 - Codex-first skill contract and references
 
-[Unreleased]: https://github.com/avalonreset/wan2gp-operator-skill/compare/v0.4.0...HEAD
-[0.4.0]: https://github.com/avalonreset/wan2gp-operator-skill/compare/v0.3.0...v0.4.0
-[0.3.0]: https://github.com/avalonreset/wan2gp-operator-skill/compare/v0.2.0...v0.3.0
-[0.2.0]: https://github.com/avalonreset/wan2gp-operator-skill/compare/v0.1.0...v0.2.0
-[0.1.0]: https://github.com/avalonreset/wan2gp-operator-skill/releases/tag/v0.1.0
+[Unreleased]: https://github.com/avalonreset/wan2gp-operator/compare/v0.4.0...HEAD
+[0.4.0]: https://github.com/avalonreset/wan2gp-operator/compare/v0.3.0...v0.4.0
+[0.3.0]: https://github.com/avalonreset/wan2gp-operator/compare/v0.2.0...v0.3.0
+[0.2.0]: https://github.com/avalonreset/wan2gp-operator/compare/v0.1.0...v0.2.0
+[0.1.0]: https://github.com/avalonreset/wan2gp-operator/releases/tag/v0.1.0

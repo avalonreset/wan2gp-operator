@@ -12,8 +12,8 @@ Contributions are welcome. See the guidelines below before submitting a PR.
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/avalonreset/wan2gp-operator-skill.git
-   cd wan2gp-operator-skill
+   git clone https://github.com/avalonreset/wan2gp-operator.git
+   cd wan2gp-operator
    ```
 
 2. Create a virtual environment:

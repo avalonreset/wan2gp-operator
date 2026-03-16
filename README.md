@@ -4,9 +4,9 @@
 
 # Wan2GP Operator - Open Source Text-to-Video CLI
 
-[![CI](https://github.com/avalonreset/wan2gp-operator-skill/actions/workflows/ci.yml/badge.svg)](https://github.com/avalonreset/wan2gp-operator-skill/actions/workflows/ci.yml)
-[![Version](https://img.shields.io/github/v/release/avalonreset/wan2gp-operator-skill)](https://github.com/avalonreset/wan2gp-operator-skill/releases)
-[![License](https://img.shields.io/github/license/avalonreset/wan2gp-operator-skill)](LICENSE)
+[![CI](https://github.com/avalonreset/wan2gp-operator/actions/workflows/ci.yml/badge.svg)](https://github.com/avalonreset/wan2gp-operator/actions/workflows/ci.yml)
+[![Version](https://img.shields.io/github/v/release/avalonreset/wan2gp-operator)](https://github.com/avalonreset/wan2gp-operator/releases)
+[![License](https://img.shields.io/github/license/avalonreset/wan2gp-operator)](LICENSE)
 
 Wan2GP Operator is an open source CLI operator for Wan2GP text-to-video generation. Running Wan2GP directly means fragile prompts, wrong runtime flags, wasted generations, and no consistent troubleshooting loop. Wan2GP Operator adds the missing layer: VRAM-aware compose, headless batch execution, auto-retry, failure diagnosis, and a music video pipeline that turns audio tracks into beat-synced AI videos.
 
@@ -39,19 +39,19 @@ This is not a GUI wrapper. It is a terminal-first operator that makes Wan2GP rep
 Clone the repository and copy it into your Codex skills directory:
 
 ```bash
-git clone https://github.com/avalonreset/wan2gp-operator-skill.git
+git clone https://github.com/avalonreset/wan2gp-operator.git
 ```
 
 ### As a Codex Skill
 
 ```bash
 # Linux/macOS
-cp -r wan2gp-operator-skill "$HOME/.codex/skills/wan2gp-operator"
+cp -r wan2gp-operator "$HOME/.codex/skills/wan2gp-operator"
 ```
 
 ```powershell
 # Windows
-Copy-Item -Path ".\wan2gp-operator-skill" -Destination "$env:USERPROFILE\.codex\skills\wan2gp-operator" -Recurse -Force
+Copy-Item -Path ".\wan2gp-operator" -Destination "$env:USERPROFILE\.codex\skills\wan2gp-operator" -Recurse -Force
 ```
 
 Restart Codex after installing. The skill registers on startup.
@@ -185,7 +185,7 @@ ComfyUI is a node-based GUI for chaining AI models visually. Wan2GP Operator is 
 
 Contributions are welcome. See [CONTRIBUTING.md](CONTRIBUTING.md) for development setup, code style, and PR workflow.
 
-For bugs and feature requests, [open an issue](https://github.com/avalonreset/wan2gp-operator-skill/issues). For questions and ideas, use [Discussions](https://github.com/avalonreset/wan2gp-operator-skill/discussions).
+For bugs and feature requests, [open an issue](https://github.com/avalonreset/wan2gp-operator/issues). For questions and ideas, use [Discussions](https://github.com/avalonreset/wan2gp-operator/discussions).
 
 For security vulnerabilities, do not open a public issue. See [SECURITY.md](SECURITY.md).
 
