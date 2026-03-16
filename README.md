@@ -191,11 +191,7 @@ For security vulnerabilities, do not open a public issue. See [SECURITY.md](SECU
 
 Join [AI Marketing Hub Pro](https://www.skool.com/ai-marketing-hub-pro/about?ref=59f96e9d9f2b4047b53627692d8c8f0c) for access to exclusive projects and the community behind this tool (referral link).
 
-## Also by avalonreset
-
-- **[gemini-seo](https://github.com/avalonreset/gemini-seo)** - Open source SEO audit tools for Gemini CLI
-- **[codex-seo](https://github.com/avalonreset/codex-seo)** - Open source SEO audit tools for Codex CLI
-- **[BenjaminTerm](https://github.com/avalonreset/BenjaminTerm)** - Hacker-styled WezTerm terminal for Windows
+Other projects: [gemini-seo](https://github.com/avalonreset/gemini-seo) | [codex-seo](https://github.com/avalonreset/codex-seo) | [BenjaminTerm](https://github.com/avalonreset/BenjaminTerm)
 
 ## License
 
