@@ -1,125 +1,192 @@
-# Wan2GP Operator
+<!-- TODO: Add banner image -->
+
+# Wan2GP Operator - Open Source Text-to-Video CLI
 
 [![CI](https://github.com/avalonreset/wan2gp-operator-skill/actions/workflows/ci.yml/badge.svg)](https://github.com/avalonreset/wan2gp-operator-skill/actions/workflows/ci.yml)
 [![Version](https://img.shields.io/github/v/release/avalonreset/wan2gp-operator-skill)](https://github.com/avalonreset/wan2gp-operator-skill/releases)
 [![License](https://img.shields.io/github/license/avalonreset/wan2gp-operator-skill)](LICENSE)
 
-Codex-native command center for Wan2GP.
+Wan2GP Operator is an open source CLI operator for Wan2GP text-to-video generation. Running Wan2GP directly means fragile prompts, wrong runtime flags, wasted generations, and no consistent troubleshooting loop. Wan2GP Operator adds the missing layer: VRAM-aware compose, headless batch execution, auto-retry, failure diagnosis, and a music video pipeline that turns audio tracks into beat-synced AI videos.
 
-Stop babysitting sliders. Stop guessing memory limits. Stop burning runs on broken settings.
-`wan2gp-operator` turns Wan2GP into a disciplined, terminal-first production workflow.
+## Table of Contents
 
-## Why This Exists
+- [What It Does](#what-it-does)
+- [Installation](#installation)
+- [Quick Start](#quick-start)
+- [Commands](#commands)
+- [AI Music Video Pipeline](#ai-music-video-pipeline)
+- [FAQ](#faq)
+- [Contributing](#contributing)
+- [License](#license)
 
-Wan2GP is powerful. But raw power without guardrails is chaos:
+## What It Does
 
-- fragile prompts
-- wrong runtime flags
-- bad checkpoint states
-- wasted generations
-- no consistent troubleshooting loop
+| Capability | Description |
+|------------|-------------|
+| Bootstrap | Guided install, GPU detection, readiness checks |
+| Compose | VRAM-aware prompt-to-settings with quality presets |
+| Run | Deterministic `--dry-run` then `--run` pipeline with structured logs |
+| Evolve | Learn from failures, track compatibility state over time |
+| Diagnose | Failure analysis with actionable next-step commands |
+| Music Video | End-to-end audio-to-video pipeline with beat-synced generation |
 
-Wan2GP Operator adds the missing layer: operational intelligence.
+This is not a GUI wrapper. It is a terminal-first operator that makes Wan2GP reproducible, diagnosable, and automatable.
 
-## Why This Beats Using Wan2GP Directly
+## Installation
 
-Using Wan2GP directly:
-
-- manual setup drift
-- easy to misconfigure runs
-- no standard dry-run workflow
-- no persistent learning from failures
-- weak postmortem trail
-
-Using Wan2GP Operator:
-
-- guided install + readiness checks
-- VRAM-aware compose flow
-- deterministic `run --dry-run` -> `run` pipeline
-- structured logs + diagnostics
-- evolving compatibility/quality state over time
-
-This is not "more UI." It is better control.
-
-## Core Capabilities
-
-- Bootstrap install and launch
-- Hardware/readiness assessment
-- Prompt-to-settings composer
-- Headless batch execution
-- Auto-retry for known CLI incompatibilities
-- Failure diagnosis with next-step commands
-- Upstream release tracking
-- Recursive evolution state (`.wan2gp_operator_state.json`)
-- Music-video pipeline (audio analyze -> beat plan -> clip generation -> ffmpeg assembly)
-
-## Workflow
+Clone the repository and copy it into your Codex skills directory:
 
 ```bash
-python scripts/wan2gp_operator.py bootstrap
-python scripts/wan2gp_operator.py compose --prompt "cinematic street shot" --quality quality --duration-seconds 4
-python scripts/wan2gp_operator.py run --wan-root <WAN2GP_ROOT> --process <settings.json> --dry-run
-python scripts/wan2gp_operator.py run --wan-root <WAN2GP_ROOT> --process <settings.json> --log-file logs/run.log
-python scripts/wan2gp_operator.py evolve --wan-root <WAN2GP_ROOT> --log-file logs/run.log
+git clone https://github.com/avalonreset/wan2gp-operator-skill.git
 ```
 
-## Music Video Pipeline (Phase 1)
+### As a Codex Skill
 
-Turn one track into a structured multi-shot video using Wan2GP as the generation engine.
+```bash
+# Linux/macOS
+cp -r wan2gp-operator-skill "$HOME/.codex/skills/wan2gp-operator"
+```
 
-### End-to-end
+```powershell
+# Windows
+Copy-Item -Path ".\wan2gp-operator-skill" -Destination "$env:USERPROFILE\.codex\skills\wan2gp-operator" -Recurse -Force
+```
+
+Restart Codex after installing. The skill registers on startup.
+
+### Prerequisites
+
+- Python 3.11+
+- A Wan2GP installation (the operator wraps it, does not replace it)
+- GPU with 12GB+ VRAM recommended for quality generation
+- `ffmpeg` and `ffprobe` (required for the music video pipeline)
+- `librosa` (optional, improves beat detection accuracy)
+
+## Quick Start
+
+```bash
+# 1. Check hardware readiness
+python scripts/wan2gp_operator.py assess
+
+# 2. Bootstrap Wan2GP installation
+python scripts/wan2gp_operator.py bootstrap
+
+# 3. Compose settings from a prompt
+python scripts/wan2gp_operator.py compose \
+  --prompt "cinematic street shot, golden hour" \
+  --quality quality \
+  --duration-seconds 4
+
+# 4. Dry run first, then execute
+python scripts/wan2gp_operator.py run \
+  --wan-root <WAN2GP_ROOT> \
+  --process settings.json \
+  --dry-run
+
+python scripts/wan2gp_operator.py run \
+  --wan-root <WAN2GP_ROOT> \
+  --process settings.json \
+  --log-file logs/run.log
+
+# 5. Learn from the run
+python scripts/wan2gp_operator.py evolve \
+  --wan-root <WAN2GP_ROOT> \
+  --log-file logs/run.log
+```
+
+The compose step produces a `settings.json` tuned to your GPU's VRAM. The dry run validates everything before burning compute. The evolve step records what worked and what failed into `.wan2gp_operator_state.json` so the next run is smarter.
+
+## Commands
+
+| Command | What It Does |
+|---------|-------------|
+| `assess` | Check GPU, VRAM, and system readiness |
+| `bootstrap` | Full guided install of Wan2GP |
+| `setup` | Configure Wan2GP environment |
+| `compose` | Generate run settings from a text prompt |
+| `plan` | Preview what a run will do before executing |
+| `run` | Execute a generation (supports `--dry-run`) |
+| `diagnose` | Analyze failures and suggest fixes |
+| `evolve` | Record outcomes and improve future runs |
+| `updates` | Check for upstream Wan2GP releases |
+| `launch-ui` | Start the Wan2GP web interface |
+| `music-video` | End-to-end music video generation |
+| `music-analyze` | Analyze audio for BPM, beats, and sections |
+| `music-plan` | Create beat-aligned shot timeline |
+| `music-generate` | Generate video clips from the plan |
+| `music-assemble` | Stitch clips and mux audio into final video |
+
+## AI Music Video Pipeline
+
+Turn one audio track into a structured, beat-synced AI music video using Wan2GP as the generation engine.
+
+### One command
 
 ```bash
 python scripts/wan2gp_operator.py music-video \
-  --audio "<SONG>.mp3" \
+  --audio "track.mp3" \
   --theme "neon summer city, confident performance energy" \
   --wan-root <WAN2GP_ROOT> \
   --execute-generation \
   --evolve-on-failure
 ```
 
-### Stage-by-stage
+This analyzes the audio (BPM, beat grid, sections), plans shots aligned to beats, generates each clip via Wan2GP, retries failures automatically, and assembles the final video with ffmpeg.
+
+### Stage by stage
 
 ```bash
-python scripts/wan2gp_operator.py music-analyze --audio "<SONG>.mp3"
-python scripts/wan2gp_operator.py music-plan --analysis <audio_analysis.json> --theme "<THEME>"
-python scripts/wan2gp_operator.py music-generate --plan <music_plan.json> --wan-root <WAN2GP_ROOT> --execute-generation
-python scripts/wan2gp_operator.py music-assemble --audio "<SONG>.mp3" --manifest <generation_manifest.json>
+# Analyze audio structure
+python scripts/wan2gp_operator.py music-analyze --audio "track.mp3"
+
+# Plan shots aligned to beats
+python scripts/wan2gp_operator.py music-plan \
+  --analysis audio_analysis.json \
+  --theme "neon summer city"
+
+# Generate each clip
+python scripts/wan2gp_operator.py music-generate \
+  --plan music_video_plan.json \
+  --wan-root <WAN2GP_ROOT> \
+  --execute-generation
+
+# Assemble final video
+python scripts/wan2gp_operator.py music-assemble \
+  --audio "track.mp3" \
+  --manifest generation_manifest.json
 ```
 
-### Generated artifacts
+### Output artifacts
 
-- `audio_analysis.json`: duration, BPM, beat grid, sections
-- `music_video_plan.json`: beat-aligned shot timeline and prompts
-- `generation_manifest.json`: take-by-take compose/run/evolve results
-- `music_video_master.mp4`: assembled output with track muxed in
+| File | Contents |
+|------|----------|
+| `audio_analysis.json` | Duration, BPM, beat grid, sections |
+| `music_video_plan.json` | Beat-aligned shot timeline and prompts |
+| `generation_manifest.json` | Per-take compose/run/evolve results |
+| `music_video_master.mp4` | Final video with audio muxed in |
 
-### Dependencies
+## FAQ
 
-- Required: `ffmpeg`, `ffprobe`
-- Optional but recommended: `librosa` (better beat detection)
+### What is the best open source text-to-video model?
 
-## Skill Layout
+As of early 2026, the top open source text-to-video models include Wan 2.1/2.2, Mochi 1, LTX2, HunyuanVideo, and CogVideoX. Wan2GP Operator specifically wraps Wan2GP (based on the Wan model family) and adds operational tooling: VRAM-aware settings, batch execution, failure diagnosis, and evolution tracking. Google's AI Overview lists Wan 2.1/2.2 as "versatile, noted for its efficiency."
 
-- `SKILL.md`: skill contract and routing
-- `scripts/`: operational CLI tools
-- `references/`: practical runbooks and tuning notes
-- `agents/`: agent-facing metadata
+### Can this generate AI music videos?
 
-## Install As A Codex Skill
+Yes. The music video pipeline analyzes your audio track (BPM, beats, sections), generates beat-synced video clips through Wan2GP, retries failed generations automatically, and assembles the final video with ffmpeg. One command or four stages, depending on how much control you want.
 
-Copy this folder into your Codex skills directory as `wan2gp-operator`.
+### How is this different from ComfyUI?
 
-Windows example:
+ComfyUI is a node-based GUI for chaining AI models visually. Wan2GP Operator is a terminal-first CLI that wraps Wan2GP specifically. The tradeoffs: ComfyUI gives you visual flexibility across many models. Wan2GP Operator gives you reproducible, scriptable, headless batch execution with built-in failure diagnosis for Wan2GP specifically.
 
-```powershell
-Copy-Item -Path ".\\wan2gp-operator-skill" -Destination "$env:USERPROFILE\\.codex\\skills\\wan2gp-operator" -Recurse -Force
-```
+## Contributing
 
-Then restart Codex and invoke the skill by name.
+Contributions are welcome. See [CONTRIBUTING.md](CONTRIBUTING.md) for development setup, code style, and PR workflow.
 
-## Positioning
+For bugs and feature requests, [open an issue](https://github.com/avalonreset/wan2gp-operator-skill/issues). For questions and ideas, use [Discussions](https://github.com/avalonreset/wan2gp-operator-skill/discussions).
 
-Wan2GP Operator is for builders who care about outcomes, not ritual.
-You can keep clicking around and hoping for magic.
-Or you can run a repeatable video ops pipeline that gets better every time.
+For security vulnerabilities, do not open a public issue. See [SECURITY.md](SECURITY.md).
+
+## License
+
+MIT License. See [LICENSE](LICENSE).
