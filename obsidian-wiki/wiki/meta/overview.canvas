@@ -1,0 +1,84 @@
+{
+  "nodes": [
+    {
+      "id": "overview",
+      "type": "file",
+      "file": "wiki/overview.md",
+      "x": 0,
+      "y": 0,
+      "width": 320,
+      "height": 160,
+      "color": "1"
+    },
+    {
+      "id": "workflow",
+      "type": "file",
+      "file": "wiki/flows/Agent Operated WanGP Workflow.md",
+      "x": 420,
+      "y": 0,
+      "width": 320,
+      "height": 160,
+      "color": "5"
+    },
+    {
+      "id": "models",
+      "type": "file",
+      "file": "wiki/domains/Model Research.md",
+      "x": 0,
+      "y": 240,
+      "width": 320,
+      "height": 160,
+      "color": "3"
+    },
+    {
+      "id": "release",
+      "type": "file",
+      "file": "wiki/domains/Release Track.md",
+      "x": 420,
+      "y": 240,
+      "width": 320,
+      "height": 160,
+      "color": "2"
+    },
+    {
+      "id": "handoff",
+      "type": "file",
+      "file": "wiki/domains/User Handoff.md",
+      "x": 840,
+      "y": 120,
+      "width": 320,
+      "height": 160,
+      "color": "4"
+    }
+  ],
+  "edges": [
+    {
+      "id": "e1",
+      "fromNode": "overview",
+      "fromSide": "right",
+      "toNode": "workflow",
+      "toSide": "left"
+    },
+    {
+      "id": "e2",
+      "fromNode": "overview",
+      "fromSide": "bottom",
+      "toNode": "models",
+      "toSide": "top"
+    },
+    {
+      "id": "e3",
+      "fromNode": "workflow",
+      "fromSide": "bottom",
+      "toNode": "release",
+      "toSide": "top"
+    },
+    {
+      "id": "e4",
+      "fromNode": "workflow",
+      "fromSide": "right",
+      "toNode": "handoff",
+      "toSide": "left"
+    }
+  ]
+}

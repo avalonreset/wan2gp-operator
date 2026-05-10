@@ -7,3 +7,10 @@ __pycache__/
 Thumbs.db
 
 .github-audit/
+
+# Obsidian vault UI state
+obsidian-wiki/.obsidian/workspace.json
+obsidian-wiki/.obsidian/workspace-mobile.json
+obsidian-wiki/.trash/
+obsidian-wiki/.smart-connections/
+obsidian-wiki/.obsidian-git-data

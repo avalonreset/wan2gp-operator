@@ -42,3 +42,16 @@ Commands:
 - Do not recommend tiny demo models on high-memory machines unless debugging install health.
 - Use `wan2gp_operator.py models` before making "best current model" recommendations.
 
+## Development Wiki
+
+Path: `obsidian-wiki/`
+
+When work depends on prior project decisions, release history, model guidance,
+or agent workflow design:
+1. Read `obsidian-wiki/wiki/hot.md` first.
+2. If more context is needed, read `obsidian-wiki/wiki/index.md`.
+3. Then drill into domain, decision, flow, or module pages.
+
+Keep the wiki current after significant project changes by updating
+`wiki/log.md`, `wiki/hot.md`, and any affected index pages.
+
