@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [0.5.3] - 2026-05-10
+
+### Changed
+- Public docs now make the agent-operated workflow explicit: Codex or Claude installs/updates WanGP, composes settings, runs headless jobs, inspects logs, diagnoses failures, and retries with safer compatibility choices.
+
 ## [0.5.2] - 2026-05-10
 
 ### Changed

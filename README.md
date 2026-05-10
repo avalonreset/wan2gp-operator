@@ -8,7 +8,9 @@
 [![Version](https://img.shields.io/github/v/release/avalonreset/wan2gp-operator)](https://github.com/avalonreset/wan2gp-operator/releases)
 [![License](https://img.shields.io/github/license/avalonreset/wan2gp-operator)](LICENSE)
 
-Wan2GP Operator is an open source CLI operator for WanGP/Wan2GP video generation. Running WanGP directly means fragile prompts, wrong runtime flags, wasted generations, and no consistent troubleshooting loop. Wan2GP Operator adds the missing layer: current model guidance, VRAM-aware compose, headless batch execution, auto-retry, failure diagnosis, and a music video pipeline that turns audio tracks into beat-synced AI videos.
+Wan2GP Operator is an open source CLI operator for WanGP/Wan2GP video generation. The goal is not to make users memorize every WanGP setting. The goal is to let Codex, Claude, or another terminal agent install WanGP, compose the right settings, run headless jobs, inspect logs, and correct course when something breaks.
+
+Running WanGP directly means fragile prompts, wrong runtime flags, wasted generations, and no consistent troubleshooting loop. Wan2GP Operator adds the missing layer: current model guidance, VRAM-aware compose, headless batch execution, auto-retry, failure diagnosis, learned compatibility state, and a music video pipeline that turns audio tracks into beat-synced AI videos.
 
 ## Table of Contents
 
@@ -33,7 +35,7 @@ Wan2GP Operator is an open source CLI operator for WanGP/Wan2GP video generation
 | Diagnose | Failure analysis with actionable next-step commands |
 | Music Video | End-to-end audio-to-video pipeline with beat-synced generation |
 
-This is not a GUI wrapper. It is a terminal-first operator that makes Wan2GP reproducible, diagnosable, and automatable.
+This is not a GUI wrapper. It is a terminal-first agent control layer that makes Wan2GP reproducible, diagnosable, and automatable. The human gives creative intent. The agent uses the operator to choose the model target, generate settings, dry-run the job, execute it, diagnose failures, and retry with safer flags when needed.
 
 ## Installation
 

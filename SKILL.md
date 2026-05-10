@@ -17,8 +17,10 @@ description: >
 # Wan2GP Operator
 
 Run Wan2GP from terminal as a guided operating layer over the UI and headless
-engine. Default to deterministic scripts, JSON outputs, and explicit safety
-checks.
+engine. The user should not have to choose every WanGP setting by hand. Use this
+skill as the agent interface: install or update WanGP, compose VRAM-aware
+settings, dry-run, execute headless jobs, inspect logs, diagnose failures, and
+retry with safer flags when the run proves a setting is unsupported.
 
 ## Process
 

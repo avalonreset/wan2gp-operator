@@ -2,6 +2,8 @@
 
 Use this repository as a Claude-compatible skill suite for operating WanGP/Wan2GP from the terminal.
 
+The intended workflow is agent-operated. The human supplies creative direction and hardware context. Claude uses this repo to install or update WanGP, choose the model target, compose settings, run `wgp.py --process` headlessly, read logs, diagnose failures, and retry with safer compatibility choices.
+
 ## Command Surface
 
 Prefer the unified entrypoint:

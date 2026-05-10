@@ -2,6 +2,11 @@
 
 Use this workflow for reliable batch rendering from saved Wan2GP queue/settings files.
 
+This runbook is agent-facing. A user should be able to ask Codex or Claude for a
+result in plain language, then let the operator translate that intent into a
+WanGP process file, a dry-run, a headless run, and a diagnosis loop if anything
+fails.
+
 Preferred entrypoint:
 ```bash
 python scripts/wan2gp_operator.py <command>

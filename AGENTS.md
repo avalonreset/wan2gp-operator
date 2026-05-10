@@ -2,6 +2,10 @@
 
 Codex-first terminal operations layer for Wan2GP.
 
+This repo is meant to let Codex operate WanGP for the user. The user provides
+intent; Codex handles install/update checks, model selection, settings
+composition, dry-runs, headless execution, log diagnosis, and corrective retries.
+
 ## Unified Interface
 
 Use one command surface:
