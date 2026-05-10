@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [0.5.2] - 2026-05-10
+
+### Changed
+- 96GB+ quality-mode composition now recommends the high-end `sage2` / `profile 3` / compile runtime path instead of the conservative SDPA path.
+- High-end performance guidance now centers GX10/DGX Spark-class tests on LTX-2.3 Dev 22B and Wan 2.2 A14B comparisons.
+
+## [0.5.1] - 2026-05-10
+
 ### Changed
 - Music-video generation now passes curated model targets into shot composition, so the sequential FFmpeg pipeline can use LTX-2.3 instead of being forced back to Wan 2.2 on high-VRAM GPUs.
 - Legacy `t2v_2_2` enforcement is now opt-in through `--model-policy`, and explicit `--model` choices take precedence.

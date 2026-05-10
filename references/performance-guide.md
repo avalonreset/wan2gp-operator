@@ -8,7 +8,7 @@ Starter defaults by VRAM tier for stable first runs:
 | 10-12GB | Wan 2.2 14B conservative | `sdpa` | `4` | `1.5` | Off |
 | 16-20GB | `ltx23-distilled-22b` or Wan 2.2 14B | `sage` | `3` | `2.0` | On |
 | 24GB+ | `ltx23-dev-22b` or Wan 2.2 14B quality | `sage2` | `3` | `2.0` | On |
-| 96GB+ | `ltx23-dev-22b` quality, longer 720p tests, FlashVSR postprocess | `sage2` | `3` | optional | On |
+| 96GB+ | `ltx23-dev-22b` quality, longer 720p tests, then Wan 2.2 A14B comparisons | `sage2` | `3` | optional | On |
 
 ## Known Tradeoffs
 
@@ -32,6 +32,12 @@ you are only debugging installation. Start with:
 
 ```bash
 python scripts/wan2gp_operator.py compose --model ltx23-dev-22b --quality quality --duration-seconds 10 --fps 24 --prompt "<PROMPT>"
+```
+
+Then compare against Wan 2.2 T2V or I2V A14B at the same prompt length and resolution:
+
+```bash
+python scripts/wan2gp_operator.py compose --model wan22-t2v-14b --quality quality --duration-seconds 10 --fps 24 --prompt "<PROMPT>"
 ```
 
 If you want fast iteration while keeping the LTX-2.3 path:

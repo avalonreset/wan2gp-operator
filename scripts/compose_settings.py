@@ -103,10 +103,12 @@ def _select_model_key(args: argparse.Namespace, vram_gb: float) -> str:
 
 def _recommended_runtime_flags(vram_gb: float, quality: str) -> dict[str, Any]:
     """Recommend headless runtime flags matching hardware tier."""
-    # For quality-targeted runs, prefer SDPA stability over aggressive backends.
     if quality == "quality":
         if vram_gb <= 12:
             return {"attention": "sdpa", "profile": "4", "teacache": 1.5, "compile": False}
+        if vram_gb >= 96:
+            return {"attention": "sage2", "profile": "3", "teacache": None, "compile": True}
+        # Mid-tier quality runs bias toward the safest backend to avoid wasting long jobs.
         return {"attention": "sdpa", "profile": "3", "teacache": None, "compile": False}
     if vram_gb <= 8:
         return {"attention": "sdpa", "profile": "4", "teacache": 1.5, "compile": False}
