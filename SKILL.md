@@ -4,12 +4,14 @@ description: >
   Codex-first operations suite for Wan2GP. Assesses installation readiness,
   plans or executes setup, composes Wan2GP settings JSON from natural-language
   prompts with VRAM-aware defaults, runs `wgp.py --process` headless jobs,
-  diagnoses failures, checks/summarizes upstream releases, and orchestrates
+  diagnoses failures, checks/summarizes upstream releases, reports current
+  open-source model guidance, and orchestrates
   music-video pipelines from an audio track. Use when user
   says "set up wan2gp", "is my machine good for wan2gp", "run this wan2gp
   queue", "generate wan2gp settings from this prompt", "wan2gp failed",
   "check wan2gp updates", "what changed in the new wan2gp release", "make a
-  music video from this song", or "beat-sync wan2gp clips".
+  music video from this song", "beat-sync wan2gp clips", or "what is the
+  hottest open source video model".
 ---
 
 # Wan2GP Operator
@@ -60,6 +62,22 @@ python scripts/wan2gp_operator.py compose \
   --duration-seconds 5
 ```
 
+For the current hot open-source audio-video target:
+```bash
+python scripts/wan2gp_operator.py compose \
+  --model ltx23-dev-22b \
+  --quality quality \
+  --prompt "<PROMPT>"
+```
+
+For faster LTX-2.3 iteration:
+```bash
+python scripts/wan2gp_operator.py compose \
+  --model ltx23-distilled-22b \
+  --quality balanced \
+  --prompt "<PROMPT>"
+```
+
 ### Step 4: Build and Validate Headless Plan
 
 Plan run:
@@ -104,7 +122,18 @@ Run:
 python scripts/wan2gp_operator.py updates --wan-root <WAN2GP_ROOT>
 ```
 
-### Step 8: Evolve Capability State
+### Step 8: Check Current Model Guidance
+
+Run:
+```bash
+python scripts/wan2gp_operator.py models
+python scripts/wan2gp_operator.py models --wan-root <WAN2GP_ROOT>
+```
+
+As of 2026-05-10, use LTX-2.3 22B as the hot general open-source audio-video
+target and Wan 2.2 14B as the strongest Wan-family workhorse inside WanGP.
+
+### Step 9: Evolve Capability State
 
 Inspect learned compatibility and ingest failed logs:
 ```bash
@@ -116,7 +145,7 @@ python scripts/wan2gp_operator.py evolve --wan-root <WAN2GP_ROOT> --log-file <LO
 in `<WAN2GP_ROOT>/.wan2gp_operator_state.json`.
 It also learns unsupported attention backends from logs and auto-falls back to `sdpa`.
 
-### Step 9: Build A Music Video Pipeline
+### Step 10: Build A Music Video Pipeline
 
 Single command:
 ```bash
@@ -146,6 +175,7 @@ Before marking a run as complete:
 - [ ] Full run command and log file path captured
 - [ ] Failure diagnosis produced when exit status was non-zero
 - [ ] Update check performed when user asks about latest release changes
+- [ ] Model guidance checked before recommending a "best current" open-source video model
 - [ ] Capability state reviewed/updated after repeat failures
 - [ ] For music-video runs: analysis, plan, generation manifest, and assembly outputs captured
 
@@ -158,6 +188,7 @@ Return:
 - Exit status and elapsed time
 - If failed: root causes and next command to try
 - If update exists: version, highlights, and safe update commands
+- If model guidance was requested: hot model, practical default, and why
 - If auto-adjusted: include retry attempts, applied adjustments, and state file path
 
 ## Codex Notes
@@ -196,6 +227,13 @@ Actions:
 1. `wan2gp_operator.py updates --wan-root ...`
 2. Summarize highlights in plain language
 3. Provide update commands if newer version exists
+
+### Example: Current Model Recommendation
+User says: "What should I run on a 128GB DGX/GX10?"
+Actions:
+1. `wan2gp_operator.py models`
+2. Recommend LTX-2.3 22B for audio-video or Wan 2.2 14B for Wan-family generation
+3. Use `compose --model ltx23-dev-22b --quality quality` unless the user wants fast iteration
 
 ### Example: Recursive Improvement
 User says: "It failed again, make it learn and retry smarter."

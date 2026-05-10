@@ -6,6 +6,7 @@ Operate Wan2GP queues safely and deterministically.
 
 ```bash
 python scripts/detect_gpu.py
+python scripts/wan2gp_operator.py models
 python scripts/plan_run.py --wan-root <WAN2GP_ROOT> --process <QUEUE_OR_SETTINGS>
 python scripts/run_headless.py --wan-root <WAN2GP_ROOT> --process <QUEUE_OR_SETTINGS> --dry-run
 python scripts/run_headless.py --wan-root <WAN2GP_ROOT> --process <QUEUE_OR_SETTINGS> --log-file logs/wan2gp.log
@@ -21,3 +22,6 @@ python scripts/diagnose_failure.py --log-file logs/wan2gp.log
 ## Operating Rule
 
 Run dry-run first unless the user explicitly asks to skip it.
+
+As of 2026-05-10, prefer LTX-2.3 22B for current open-source audio-video work
+and Wan 2.2 14B for Wan-family video generation.

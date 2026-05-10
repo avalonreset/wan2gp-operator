@@ -7,6 +7,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [0.5.0] - 2026-05-10
+
+### Added
+- Current open-source model guidance command: `wan2gp_operator.py models`
+- Curated model catalog for WanGP v11.61-era targets:
+  - `ltx23-dev-22b`
+  - `ltx23-distilled-22b`
+  - `wan22-t2v-14b`
+  - `wan22-i2v-14b`
+  - `magi-human-15b`
+- `compose --model ...` for direct LTX-2.3, Wan 2.2, and Magi Human settings generation
+- `CLAUDE.md` for Claude Code/project compatibility
+
+### Changed
+- README and skill docs now position LTX-2.3 22B as the hot general open-source audio-video target and Wan 2.2 14B as the Wan-family workhorse
+- High-memory guidance no longer defaults to tiny demo models except for install debugging
+- Update checks now include the latest upstream main-branch commit when WanGP publishes version data through README rather than GitHub releases
+- Codex skill installer now targets `.codex/skills`
+
 ## [0.4.0] - 2026-03-16
 
 ### Added
@@ -57,7 +76,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 - Bootstrap, compose, run, diagnose, updates, evolve workflows
 - Codex-first skill contract and references
 
-[Unreleased]: https://github.com/avalonreset/wan2gp-operator/compare/v0.4.0...HEAD
+[Unreleased]: https://github.com/avalonreset/wan2gp-operator/compare/v0.5.0...HEAD
+[0.5.0]: https://github.com/avalonreset/wan2gp-operator/compare/v0.4.0...v0.5.0
 [0.4.0]: https://github.com/avalonreset/wan2gp-operator/compare/v0.3.0...v0.4.0
 [0.3.0]: https://github.com/avalonreset/wan2gp-operator/compare/v0.2.0...v0.3.0
 [0.2.0]: https://github.com/avalonreset/wan2gp-operator/compare/v0.1.0...v0.2.0

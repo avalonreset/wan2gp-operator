@@ -33,7 +33,7 @@ def resolve_destination(platform: str, scope: str, project_root: str | None) -> 
         home = Path.home()
         roots = {
             "claude": home / ".claude" / "skills",
-            "codex": home / ".agents" / "skills",
+            "codex": home / ".codex" / "skills",
             "gemini": home / ".gemini" / "skills",
         }
         return roots[platform]
@@ -43,7 +43,7 @@ def resolve_destination(platform: str, scope: str, project_root: str | None) -> 
     root = Path(project_root).expanduser().resolve()
     roots = {
         "claude": root / ".claude" / "skills",
-        "codex": root / ".agents" / "skills",
+        "codex": root / ".codex" / "skills",
         "gemini": root / ".gemini" / "skills",
     }
     return roots[platform]
@@ -63,7 +63,15 @@ def main() -> int:
 
         if destination.exists():
             shutil.rmtree(destination)
-        shutil.copytree(source, destination, ignore=shutil.ignore_patterns("__pycache__", "*.pyc"))
+        ignore = shutil.ignore_patterns(
+            "__pycache__",
+            "*.pyc",
+            ".git",
+            ".codex",
+            ".claude",
+            ".gemini",
+        )
+        shutil.copytree(source, destination, ignore=ignore)
 
         print(
             json.dumps(

@@ -65,6 +65,20 @@ def _fetch_latest_release(repo: str) -> dict[str, Any]:
         }
 
     # Fallback to README version scraping for repos that publish updates there.
+    commits_url = f"https://api.github.com/repos/{repo}/commits/main"
+    latest_commit = None
+    latest_commit_date = None
+    try:
+        commit = _fetch_json(commits_url)
+        latest_commit = commit.get("sha")
+        latest_commit_date = (
+            commit.get("commit", {}).get("committer", {}).get("date")
+            if isinstance(commit, dict)
+            else None
+        )
+    except Exception:
+        latest_commit = None
+
     readme_url = f"https://raw.githubusercontent.com/{repo}/main/README.md"
     request = Request(readme_url, headers={"User-Agent": "wan2gp-operator"})
     with urlopen(request, timeout=20) as response:
@@ -88,10 +102,11 @@ def _fetch_latest_release(repo: str) -> dict[str, Any]:
 
         return {
             "version": version,
-            "published_at": None,
+            "published_at": latest_commit_date,
             "url": f"https://github.com/{repo}",
             "body": section_text,
             "source": "readme",
+            "commit": latest_commit,
         }
 
     raise RuntimeError("No releases, tags, or detectable README version found for repository.")
@@ -174,6 +189,7 @@ def main() -> int:
             "published_at": remote_published_at,
             "url": remote_url,
             "source": latest["source"],
+            "commit": latest.get("commit"),
         },
         "highlights": highlights,
         "local": {

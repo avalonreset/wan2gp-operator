@@ -18,6 +18,7 @@ import re
 from typing import Any
 
 from detect_gpu import build_report
+from model_catalog import MODEL_TARGETS, auto_model_key, get_model_target
 
 
 def _parse_args() -> argparse.Namespace:
@@ -26,6 +27,12 @@ def _parse_args() -> argparse.Namespace:
     parser.add_argument("--prompt", required=True, help="Primary generation prompt")
     parser.add_argument("--negative-prompt", default="", help="Optional negative prompt")
     parser.add_argument("--task", choices=["auto", "t2v", "i2v", "vace"], default="auto")
+    parser.add_argument(
+        "--model",
+        choices=["auto", *sorted(MODEL_TARGETS.keys())],
+        default="auto",
+        help="Curated model target. Use ltx23-dev-22b for the hottest quality target.",
+    )
     parser.add_argument("--quality", choices=["draft", "balanced", "quality"], default="balanced")
     parser.add_argument("--duration-seconds", type=float, default=5.0, help="Target clip duration")
     parser.add_argument("--fps", type=int, default=16, help="FPS estimate for frame planning")
@@ -36,6 +43,7 @@ def _parse_args() -> argparse.Namespace:
     )
     parser.add_argument("--seed", type=int, default=-1, help="Seed value (-1 random)")
     parser.add_argument("--image-start", help="Start image path (for i2v/vace)")
+    parser.add_argument("--audio-source", help="Optional audio path for audio-conditioned models")
     parser.add_argument("--vram-gb", type=float, help="Override detected VRAM")
     parser.add_argument("--output", help="Output JSON file path")
     return parser.parse_args()
@@ -49,6 +57,8 @@ def _max_frames_for_vram(vram_gb: float) -> int:
         return 121
     if vram_gb <= 20:
         return 161
+    if vram_gb >= 96:
+        return 481
     return 241
 
 
@@ -82,6 +92,13 @@ def _select_model(task: str, has_image: bool, vram_gb: float, quality: str) -> s
     if vram_gb >= 20 and quality == "quality":
         return "t2v_2_2"
     return "t2v" if vram_gb >= 12 and quality != "draft" else "t2v_1.3B"
+
+
+def _select_model_key(args: argparse.Namespace, vram_gb: float) -> str:
+    """Choose a curated model key, preserving legacy auto behavior where needed."""
+    if args.model != "auto":
+        return args.model
+    return auto_model_key(args.task, bool(args.image_start), vram_gb, args.quality)
 
 
 def _recommended_runtime_flags(vram_gb: float, quality: str) -> dict[str, Any]:
@@ -125,18 +142,19 @@ def _prompt_quality_warnings(prompt: str) -> list[str]:
     return warnings
 
 
-def _build_settings(args: argparse.Namespace, vram_gb: float) -> tuple[dict[str, Any], list[str]]:
-    """Build minimal settings payload accepted by Wan2GP parser."""
+def _build_legacy_wan_settings(args: argparse.Namespace, vram_gb: float) -> dict[str, Any]:
+    """Build the pre-catalog Wan settings payload for backwards compatibility."""
     width, height = _parse_resolution(args.resolution)
     frames_raw = max(16, int(round(args.duration_seconds * args.fps)))
     frame_cap = _max_frames_for_vram(vram_gb)
     frames = min(frames_raw, frame_cap)
     steps = _steps_for_quality(args.quality, vram_gb)
     model_type = _select_model(args.task, bool(args.image_start), vram_gb, args.quality)
-    warnings = _prompt_quality_warnings(args.prompt)
 
     settings: dict[str, Any] = {
+        "type": "WanGP settings",
         "model_type": model_type,
+        "base_model_type": model_type,
         "prompt": args.prompt.strip(),
         "resolution": f"{width}x{height}",
         "num_inference_steps": steps,
@@ -144,16 +162,9 @@ def _build_settings(args: argparse.Namespace, vram_gb: float) -> tuple[dict[str,
         "seed": args.seed,
         "repeat_generation": 1,
     }
-    negative_prompt = args.negative_prompt.strip()
-    if not negative_prompt:
-        negative_prompt = (
-            "text, logo, watermark, blurry, low quality, deformed anatomy, jitter, flicker"
-        )
-    settings["negative_prompt"] = negative_prompt
     if args.image_start:
         settings["image_start"] = str(Path(args.image_start).expanduser().resolve())
     if model_type == "t2v_2_2":
-        # Wan2.2 defaults tuned for quality and motion coherence in Wan2GP.
         settings["guidance_phases"] = 2
         settings["guidance_scale"] = 4.5
         settings["guidance2_scale"] = 3.0
@@ -161,7 +172,57 @@ def _build_settings(args: argparse.Namespace, vram_gb: float) -> tuple[dict[str,
         settings["flow_shift"] = 5
         if steps < 24:
             settings["num_inference_steps"] = 24
-    return settings, warnings
+    return settings
+
+
+def _build_catalog_settings(args: argparse.Namespace, vram_gb: float) -> tuple[dict[str, Any], str]:
+    """Build settings from the curated current-model catalog."""
+    model_key = _select_model_key(args, vram_gb)
+    target = get_model_target(model_key)
+    resolution = args.resolution
+    if resolution == "832x480":
+        resolution = str(target["default_resolution"])
+    width, height = _parse_resolution(resolution)
+    frames_raw = max(16, int(round(args.duration_seconds * args.fps)))
+    frames = min(frames_raw, _max_frames_for_vram(vram_gb))
+
+    settings = target["settings"]
+    settings.update(
+        {
+            "type": "WanGP settings",
+            "prompt": args.prompt.strip(),
+            "resolution": f"{width}x{height}",
+            "num_inference_steps": int(target["default_steps"][args.quality]),
+            "video_length": frames,
+            "seed": args.seed,
+            "repeat_generation": 1,
+        }
+    )
+    if args.image_start:
+        settings["image_start"] = str(Path(args.image_start).expanduser().resolve())
+        settings.setdefault("image_prompt_type", "S")
+    if args.audio_source:
+        settings["audio_source"] = str(Path(args.audio_source).expanduser().resolve())
+        settings.setdefault("audio_prompt_type", "A")
+    return settings, model_key
+
+
+def _build_settings(args: argparse.Namespace, vram_gb: float) -> tuple[dict[str, Any], list[str], str]:
+    """Build minimal settings payload accepted by Wan2GP parser."""
+    warnings = _prompt_quality_warnings(args.prompt)
+    if args.model == "auto" and args.task == "auto" and not args.image_start and vram_gb < 16:
+        settings = _build_legacy_wan_settings(args, vram_gb)
+        model_key = str(settings["model_type"])
+    else:
+        settings, model_key = _build_catalog_settings(args, vram_gb)
+
+    negative_prompt = args.negative_prompt.strip()
+    if not negative_prompt:
+        negative_prompt = (
+            "text, logo, watermark, blurry, low quality, deformed anatomy, jitter, flicker"
+        )
+    settings["negative_prompt"] = negative_prompt
+    return settings, warnings, model_key
 
 
 def _resolve_output_path(path_arg: str | None) -> Path:
@@ -189,7 +250,7 @@ def main() -> int:
     try:
         args = _parse_args()
         vram_gb = _detect_vram(args.vram_gb)
-        settings, warnings = _build_settings(args, vram_gb)
+        settings, warnings, selected_model = _build_settings(args, vram_gb)
         runtime_flags = _recommended_runtime_flags(vram_gb, args.quality)
 
         output_path = _resolve_output_path(args.output)
@@ -201,6 +262,7 @@ def main() -> int:
             "status": "success",
             "settings_file": str(output_path),
             "detected_vram_gb": vram_gb,
+            "selected_model": selected_model,
             "settings": settings,
             "quality_warnings": warnings,
             "recommended_runtime_flags": runtime_flags,

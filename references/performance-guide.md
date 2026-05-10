@@ -2,12 +2,13 @@
 
 Starter defaults by VRAM tier for stable first runs:
 
-| VRAM | Model Preset | Attention | Profile | TeaCache | Compile |
+| VRAM | Model Target | Attention | Profile | TeaCache | Compile |
 |------|---------------|-----------|---------|----------|---------|
-| 6-8GB | `t2v-1-3B` | `sdpa` | `4` | `1.5` | Off |
-| 10-12GB | `t2v-14B` | `sdpa` | `4` | `1.5` | Off |
-| 16-20GB | `t2v-14B` | `sage` | `3` | `2.0` | On |
-| 24GB+ | `t2v-14B` | `sage2` | `3` | `2.0` | On |
+| 6-8GB | `t2v-1-3B` or conservative Wan 14B | `sdpa` | `4` | `1.5` | Off |
+| 10-12GB | Wan 2.2 14B conservative | `sdpa` | `4` | `1.5` | Off |
+| 16-20GB | `ltx23-distilled-22b` or Wan 2.2 14B | `sage` | `3` | `2.0` | On |
+| 24GB+ | `ltx23-dev-22b` or Wan 2.2 14B quality | `sage2` | `3` | `2.0` | On |
+| 96GB+ | `ltx23-dev-22b` quality, longer 720p tests, FlashVSR postprocess | `sage2` | `3` | optional | On |
 
 ## Known Tradeoffs
 
@@ -23,6 +24,21 @@ If a run fails with OOM:
 1. Switch to `--model-preset t2v-1-3B`.
 2. Force `--attention sdpa --profile 4`.
 3. Lower generation complexity (frames, steps, resolution) in queue/settings.
+
+## Current High-End Path
+
+For DGX Spark/GX10-class unified-memory machines, do not start with tiny models unless
+you are only debugging installation. Start with:
+
+```bash
+python scripts/wan2gp_operator.py compose --model ltx23-dev-22b --quality quality --duration-seconds 10 --fps 24 --prompt "<PROMPT>"
+```
+
+If you want fast iteration while keeping the LTX-2.3 path:
+
+```bash
+python scripts/wan2gp_operator.py compose --model ltx23-distilled-22b --quality balanced --duration-seconds 10 --fps 24 --prompt "<PROMPT>"
+```
 
 ## Terminal-First Tip
 

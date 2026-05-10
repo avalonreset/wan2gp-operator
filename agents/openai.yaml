@@ -1,7 +1,7 @@
 interface:
   display_name: "Wan2GP Operator"
-  short_description: "Codex-first Wan2GP suite: bootstrap install, launch UI, compose jobs, run headless."
-  default_prompt: "Use wan2gp-operator via scripts/wan2gp_operator.py to bootstrap Wan2GP and operate it from terminal."
+  short_description: "Codex/Claude-compatible WanGP suite: bootstrap install, launch UI, choose current video models, compose jobs, run headless."
+  default_prompt: "Use wan2gp-operator via scripts/wan2gp_operator.py to choose current WanGP model targets, bootstrap WanGP, and operate it from terminal."
 
 policy:
   allow_implicit_invocation: true

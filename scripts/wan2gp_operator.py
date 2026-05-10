@@ -8,6 +8,7 @@ Usage:
   python scripts/wan2gp_operator.py setup --target-dir E:/tools/Wan2GP
   python scripts/wan2gp_operator.py launch-ui --wan-root E:/tools/Wan2GP
   python scripts/wan2gp_operator.py compose --prompt "cinematic city timelapse"
+  python scripts/wan2gp_operator.py models
   python scripts/wan2gp_operator.py run --wan-root E:/tools/Wan2GP --process ./job.json --dry-run
   python scripts/wan2gp_operator.py evolve --wan-root E:/tools/Wan2GP
 """
@@ -26,6 +27,7 @@ SCRIPT_MAP = {
     "setup": "setup_wan2gp.py",
     "launch-ui": "launch_wan2gp.py",
     "compose": "compose_settings.py",
+    "models": "research_models.py",
     "plan": "plan_run.py",
     "run": "run_headless.py",
     "diagnose": "diagnose_failure.py",

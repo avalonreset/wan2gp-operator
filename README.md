@@ -8,7 +8,7 @@
 [![Version](https://img.shields.io/github/v/release/avalonreset/wan2gp-operator)](https://github.com/avalonreset/wan2gp-operator/releases)
 [![License](https://img.shields.io/github/license/avalonreset/wan2gp-operator)](LICENSE)
 
-Wan2GP Operator is an open source CLI operator for Wan2GP text-to-video generation. Running Wan2GP directly means fragile prompts, wrong runtime flags, wasted generations, and no consistent troubleshooting loop. Wan2GP Operator adds the missing layer: VRAM-aware compose, headless batch execution, auto-retry, failure diagnosis, and a music video pipeline that turns audio tracks into beat-synced AI videos.
+Wan2GP Operator is an open source CLI operator for WanGP/Wan2GP video generation. Running WanGP directly means fragile prompts, wrong runtime flags, wasted generations, and no consistent troubleshooting loop. Wan2GP Operator adds the missing layer: current model guidance, VRAM-aware compose, headless batch execution, auto-retry, failure diagnosis, and a music video pipeline that turns audio tracks into beat-synced AI videos.
 
 ## Table of Contents
 
@@ -27,6 +27,7 @@ Wan2GP Operator is an open source CLI operator for Wan2GP text-to-video generati
 |------------|-------------|
 | Bootstrap | Guided install, GPU detection, readiness checks |
 | Compose | VRAM-aware prompt-to-settings with quality presets |
+| Models | Current open-source video model guidance and curated WanGP targets |
 | Run | Deterministic `--dry-run` then `--run` pipeline with structured logs |
 | Evolve | Learn from failures, track compatibility state over time |
 | Diagnose | Failure analysis with actionable next-step commands |
@@ -73,13 +74,22 @@ python scripts/wan2gp_operator.py assess
 # 2. Bootstrap Wan2GP installation
 python scripts/wan2gp_operator.py bootstrap
 
-# 3. Compose settings from a prompt
+# 3. Check current model guidance
+python scripts/wan2gp_operator.py models
+
+# 4. Compose settings from a prompt
 python scripts/wan2gp_operator.py compose \
   --prompt "cinematic street shot, golden hour" \
   --quality quality \
   --duration-seconds 4
 
-# 4. Dry run first, then execute
+# Or target the current hot open-source audio-video model
+python scripts/wan2gp_operator.py compose \
+  --model ltx23-dev-22b \
+  --quality quality \
+  --prompt "cinematic street shot, golden hour, natural city ambience"
+
+# 5. Dry run first, then execute
 python scripts/wan2gp_operator.py run \
   --wan-root <WAN2GP_ROOT> \
   --process settings.json \
@@ -106,6 +116,7 @@ The compose step produces a `settings.json` tuned to your GPU's VRAM. The dry ru
 | `bootstrap` | Full guided install of Wan2GP |
 | `setup` | Configure Wan2GP environment |
 | `compose` | Generate run settings from a text prompt |
+| `models` | Report current hot/practical model targets |
 | `plan` | Preview what a run will do before executing |
 | `run` | Execute a generation (supports `--dry-run`) |
 | `diagnose` | Analyze failures and suggest fixes |
@@ -169,13 +180,42 @@ python scripts/wan2gp_operator.py music-assemble \
 
 ## FAQ
 
-### What is the best open source text-to-video model?
+### What is the best open source video model?
 
-As of early 2026, the top open source text-to-video models include Wan 2.1/2.2, Mochi 1, LTX2, HunyuanVideo, and CogVideoX. Wan2GP Operator specifically wraps Wan2GP (based on the Wan model family) and adds operational tooling: VRAM-aware settings, batch execution, failure diagnosis, and evolution tracking. Google's AI Overview lists Wan 2.1/2.2 as "versatile, noted for its efficiency."
+As of 2026-05-10, the operator treats **LTX-2.3 22B** as the hottest general open-source audio-video target because it combines video and native synchronized audio in one model. **Wan 2.2 14B** remains the strongest Wan-family workhorse inside WanGP, especially for text-to-video and image-to-video without learning a node graph.
+
+Run:
+
+```bash
+python scripts/wan2gp_operator.py models
+```
+
+For high-memory machines, skip tiny demo models unless debugging install health:
+
+```bash
+python scripts/wan2gp_operator.py compose --model ltx23-dev-22b --quality quality --prompt "<PROMPT>"
+```
+
+For faster iteration:
+
+```bash
+python scripts/wan2gp_operator.py compose --model ltx23-distilled-22b --quality balanced --prompt "<PROMPT>"
+```
+
+Wan2GP Operator wraps WanGP/Wan2GP and adds operational tooling: model selection, VRAM-aware settings, batch execution, failure diagnosis, and evolution tracking.
 
 ### Can this generate AI music videos?
 
 Yes. The music video pipeline analyzes your audio track (BPM, beats, sections), generates beat-synced video clips through Wan2GP, retries failed generations automatically, and assembles the final video with ffmpeg. One command or four stages, depending on how much control you want.
+
+### Does this work with Codex and Claude?
+
+Yes. The repo includes `SKILL.md` for skill-suite installs, `AGENTS.md` for Codex-style agent instructions, and `CLAUDE.md` for Claude Code/project context. Install with:
+
+```bash
+python scripts/install_skill.py --platform codex --scope user
+python scripts/install_skill.py --platform claude --scope user
+```
 
 ### How is this different from ComfyUI?
 

@@ -15,6 +15,7 @@ Commands:
 - `setup`: plan or execute installation/update workflow
 - `launch-ui`: open Wan2GP web UI from terminal
 - `compose`: create Wan2GP settings JSON from natural-language prompt
+- `models`: show current open-source video model guidance and curated targets
 - `plan`: build validated `wgp.py --process` command
 - `run`: execute headless job with optional dry-run and log capture
 - `diagnose`: analyze failures from logs/text
@@ -34,4 +35,6 @@ Commands:
 - Run dry-run before full render unless user explicitly opts out.
 - Prefer conservative profile on unknown hardware (`sdpa`, profile `4`).
 - Do not claim update status without running `wan2gp_operator.py updates`.
+- Do not recommend tiny demo models on high-memory machines unless debugging install health.
+- Use `wan2gp_operator.py models` before making "best current model" recommendations.
 
