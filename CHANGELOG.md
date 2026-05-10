@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### Changed
+- Music-video generation now passes curated model targets into shot composition, so the sequential FFmpeg pipeline can use LTX-2.3 instead of being forced back to Wan 2.2 on high-VRAM GPUs.
+- Legacy `t2v_2_2` enforcement is now opt-in through `--model-policy`, and explicit `--model` choices take precedence.
+
 ## [0.5.0] - 2026-05-10
 
 ### Added

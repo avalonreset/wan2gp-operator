@@ -17,6 +17,8 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
+from model_catalog import MODEL_TARGETS
+
 
 def _parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Generate Wan2GP shots from a music-video plan")
@@ -31,6 +33,12 @@ def _parse_args() -> argparse.Namespace:
         help="Fallback compose quality when shot does not specify quality_hint",
     )
     parser.add_argument(
+        "--model",
+        choices=["auto", *sorted(MODEL_TARGETS.keys())],
+        default="auto",
+        help="Curated model target passed to compose_settings.py for each shot.",
+    )
+    parser.add_argument(
         "--respect-shot-quality-hints",
         action="store_true",
         help="Respect per-shot quality_hint from plan. By default quality-default is enforced globally.",
@@ -38,8 +46,8 @@ def _parse_args() -> argparse.Namespace:
     parser.add_argument(
         "--model-policy",
         choices=["auto", "max-vram", "strict-t2v-2-2"],
-        default="max-vram",
-        help="Model enforcement policy. max-vram forces t2v_2_2 on high-VRAM systems.",
+        default="auto",
+        help="Legacy Wan2.2 enforcement policy. Explicit --model choices take precedence.",
     )
     parser.add_argument("--max-shots", type=int, help="Optional max number of shots to process")
     parser.add_argument("--max-takes-per-shot", type=int, help="Optional cap on takes per shot")
@@ -258,7 +266,9 @@ def _save_settings_file(path: Path, settings: dict[str, Any]) -> None:
     path.write_text(json.dumps(settings, indent=2), encoding="utf-8")
 
 
-def _should_force_t2v22(model_policy: str, detected_vram_gb: float) -> bool:
+def _should_force_t2v22(model_policy: str, detected_vram_gb: float, selected_model: str) -> bool:
+    if selected_model != "auto":
+        return False
     if model_policy == "strict-t2v-2-2":
         return True
     if model_policy == "max-vram":
@@ -270,12 +280,16 @@ def _enforce_t2v22_settings(
     process_file: Path,
     *,
     model_policy: str,
+    selected_model: str,
     detected_vram_gb: float,
     quality: str,
 ) -> dict[str, Any]:
     """Enforce high-end t2v_2_2 recipe when policy requires it."""
     report: dict[str, Any] = {"applied": False, "notes": []}
-    if not _should_force_t2v22(model_policy, detected_vram_gb):
+    if selected_model != "auto":
+        report["notes"].append(f"Skipped legacy t2v_2_2 enforcement because --model={selected_model} was explicit.")
+        return report
+    if not _should_force_t2v22(model_policy, detected_vram_gb, selected_model):
         report["notes"].append("Model policy did not require t2v_2_2 enforcement.")
         return report
 
@@ -353,6 +367,8 @@ def _compose_command(
         str(shot.get("negative_prompt", "")).strip(),
         "--quality",
         quality,
+        "--model",
+        args.model,
         "--duration-seconds",
         str(duration_seconds),
         "--resolution",
@@ -560,6 +576,7 @@ def main() -> int:
                     model_enforcement = _enforce_t2v22_settings(
                         process_file=process_file,
                         model_policy=args.model_policy,
+                        selected_model=args.model,
                         detected_vram_gb=detected_vram_gb,
                         quality=str(take_report["quality_hint"]),
                     )

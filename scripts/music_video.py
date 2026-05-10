@@ -16,6 +16,8 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
+from model_catalog import MODEL_TARGETS
+
 
 def _parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Run full Wan2GP music-video pipeline")
@@ -30,6 +32,18 @@ def _parse_args() -> argparse.Namespace:
         default="cinematic",
     )
     parser.add_argument("--quality-default", choices=["draft", "balanced", "quality"], default="balanced")
+    parser.add_argument(
+        "--model",
+        choices=["auto", *sorted(MODEL_TARGETS.keys())],
+        default="auto",
+        help="Curated model target for generated shots.",
+    )
+    parser.add_argument(
+        "--model-policy",
+        choices=["auto", "max-vram", "strict-t2v-2-2"],
+        default="auto",
+        help="Legacy Wan2.2 enforcement policy for generated shots.",
+    )
     parser.add_argument("--resolution-plan", default="832x480", help="Resolution for generated Wan2GP shots")
     parser.add_argument("--resolution-final", default="1280x720", help="Final assembled output resolution")
     parser.add_argument("--fps-plan", type=int, default=16, help="FPS for Wan2GP generation plan")
@@ -190,6 +204,10 @@ def main() -> int:
             str(manifest_file),
             "--quality-default",
             args.quality_default,
+            "--model",
+            args.model,
+            "--model-policy",
+            args.model_policy,
         ]
         if args.max_shots is not None:
             generate_command.extend(["--max-shots", str(args.max_shots)])

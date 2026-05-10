@@ -152,6 +152,7 @@ Single command:
 python scripts/wan2gp_operator.py music-video \
   --audio <SONG_FILE> \
   --theme "<CREATIVE_DIRECTION>" \
+  --model ltx23-distilled-22b \
   --wan-root <WAN2GP_ROOT> \
   --execute-generation \
   --evolve-on-failure

@@ -139,6 +139,7 @@ Turn one audio track into a structured, beat-synced AI music video using Wan2GP 
 python scripts/wan2gp_operator.py music-video \
   --audio "track.mp3" \
   --theme "neon summer city, confident performance energy" \
+  --model ltx23-distilled-22b \
   --wan-root <WAN2GP_ROOT> \
   --execute-generation \
   --evolve-on-failure
@@ -161,6 +162,7 @@ python scripts/wan2gp_operator.py music-plan \
 python scripts/wan2gp_operator.py music-generate \
   --plan music_video_plan.json \
   --wan-root <WAN2GP_ROOT> \
+  --model ltx23-distilled-22b \
   --execute-generation
 
 # Assemble final video
