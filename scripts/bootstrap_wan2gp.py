@@ -20,7 +20,7 @@ from typing import Any
 def _parse_args() -> argparse.Namespace:
     """Parse CLI args."""
     parser = argparse.ArgumentParser(description="Bootstrap Wan2GP from scratch")
-    parser.add_argument("--target-dir", default="./Wan2GP", help="Target Wan2GP root path")
+    parser.add_argument("--target-dir", default="./runtime/Wan2GP", help="Target Wan2GP root path")
     parser.add_argument("--env-manager", choices=["auto", "conda", "venv", "none"], default="auto")
     parser.add_argument("--env-name", default="wan2gp", help="Conda env name or venv folder name")
     parser.add_argument("--python-version", default="3.11.14", help="Python version for conda env")

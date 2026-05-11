@@ -22,7 +22,7 @@ Important commands:
 
 ## Current Model Guidance
 
-As of 2026-05-10, treat LTX-2.3 22B as the hot general open-source audio-video target and Wan 2.2 14B as the strongest Wan-family workhorse. For high-memory machines, do not default to tiny demo models unless debugging install health.
+As of 2026-05-10, treat LTX-2.3 22B as the hot general open-source audio-video target, ACE-Step 1.5 XL LM 4B as the high-quality local music target, and Wan 2.2 14B as the strongest Wan-family workhorse. For high-memory machines, do not default to tiny demo models unless debugging install health.
 
 Use:
 
@@ -36,9 +36,16 @@ For fast iteration:
 python scripts/wan2gp_operator.py compose --model ltx23-distilled-22b --quality balanced --prompt "<PROMPT>"
 ```
 
+For RTX 4090-class high-quality music generation:
+
+```bash
+python scripts/wan2gp_operator.py compose --task music --model ace15-xl-lm-4b --quality quality --duration-seconds 120 --prompt "<LYRICS>"
+```
+
 ## Safety Rules
 
 - Run `run --dry-run` before full rendering unless the user explicitly skips it.
 - Check `updates` before claiming WanGP is current.
 - Prefer `models` before making recommendations about the best current model.
 - Keep generated settings outside WanGP `defaults/`.
+- Keep WanGP runtime clones, venvs, logs, and generated outputs under `runtime/`.

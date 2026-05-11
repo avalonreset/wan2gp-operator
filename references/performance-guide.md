@@ -7,7 +7,7 @@ Starter defaults by VRAM tier for stable first runs:
 | 6-8GB | `t2v-1-3B` or conservative Wan 14B | `sdpa` | `4` | `1.5` | Off |
 | 10-12GB | Wan 2.2 14B conservative | `sdpa` | `4` | `1.5` | Off |
 | 16-20GB | `ltx23-distilled-22b` or Wan 2.2 14B | `sage` | `3` | `2.0` | On |
-| 24GB+ | `ltx23-dev-22b` or Wan 2.2 14B quality | `sage2` | `3` | `2.0` | On |
+| 24GB RTX 4090 class | `ltx23-distilled-22b` for iteration; explicit `ltx23-dev-22b` quality tests | `sdpa` | `3` | `2.0` for balanced iteration; optional for quality | Off |
 | 96GB+ | `ltx23-dev-22b` quality, longer 720p tests, then Wan 2.2 A14B comparisons | `sage2` | `3` | optional | On |
 
 ## Known Tradeoffs
@@ -17,6 +17,24 @@ Starter defaults by VRAM tier for stable first runs:
 - `profile 4`: best fallback when facing OOM.
 - `profile 3`: higher speed if VRAM headroom exists.
 - `teacache`: speed boost with potential quality tradeoff at higher values.
+
+## RTX 4090 Developer Path
+
+Treat 24GB cards as a serious development tier, not the same class as a
+96GB+ proof machine. Start with stable runtime flags and scale only after a
+dry-run and one successful short render:
+
+```bash
+python scripts/wan2gp_operator.py compose --model ltx23-distilled-22b --quality balanced --duration-seconds 5 --prompt "<PROMPT>"
+```
+
+For quality checks, explicitly target the dev model but keep the runtime stable
+until local Sage/Sage2 dependencies are proven. TeaCache can be omitted when
+quality matters more than iteration speed:
+
+```bash
+python scripts/wan2gp_operator.py compose --model ltx23-dev-22b --quality quality --duration-seconds 4 --prompt "<PROMPT>"
+```
 
 ## Common Fallback Path
 

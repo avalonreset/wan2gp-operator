@@ -25,6 +25,7 @@ used by agents.
 - Verify Codex and Claude skill installation paths after installer changes.
 - Do not claim WanGP update status without running `updates`.
 - Do not recommend tiny models for high-memory machines unless debugging installation health.
+- Treat RTX 4090/24GB development as a serious-model tier with stable defaults, not as the 96GB+ high-memory proof path.
 
 ## Key Pages
 

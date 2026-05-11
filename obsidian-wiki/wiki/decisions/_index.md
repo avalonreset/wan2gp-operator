@@ -15,3 +15,4 @@ status: active
 - [[High Memory Model Defaults]]
 - [[Dual Runtime Skill Compatibility]]
 - [[Report Handoff Format]]
+- [[Automated Beat Editing Rubric]]

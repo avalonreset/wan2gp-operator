@@ -28,12 +28,16 @@ learned compatibility state.
 
 ## Current Release Posture
 
-The latest release in this vault snapshot is `v0.5.3`. The recent release arc:
+The latest release in this vault snapshot is `v11.61`. Public releases now
+match the verified upstream WanGP version.
 
 - `v0.5.0`: current model guidance and curated model targets.
 - `v0.5.1`: model targets passed through the music-video pipeline.
 - `v0.5.2`: high-memory quality recommendations for 96GB+ systems.
 - `v0.5.3`: public docs clarified the agent-operated workflow.
+- `v11.61`: consolidated active WanGP under `runtime/Wan2GP`, verified WanGP
+  11.61, added ACE-Step 1.5 music compose support, and kept Codex/Claude skill
+  installs clean.
 
 ## Core System Shape
 

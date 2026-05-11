@@ -10,6 +10,7 @@ Usage:
 from __future__ import annotations
 
 import argparse
+import copy
 import json
 import sys
 from datetime import datetime, timezone
@@ -26,12 +27,12 @@ def _parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Compose Wan2GP settings JSON")
     parser.add_argument("--prompt", required=True, help="Primary generation prompt")
     parser.add_argument("--negative-prompt", default="", help="Optional negative prompt")
-    parser.add_argument("--task", choices=["auto", "t2v", "i2v", "vace"], default="auto")
+    parser.add_argument("--task", choices=["auto", "t2v", "i2v", "vace", "music"], default="auto")
     parser.add_argument(
         "--model",
         choices=["auto", *sorted(MODEL_TARGETS.keys())],
         default="auto",
-        help="Curated model target. Use ltx23-dev-22b for the hottest quality target.",
+        help="Curated model target. Use ace15-xl-lm-4b for highest-quality ACE-Step 1.5 music generation.",
     )
     parser.add_argument("--quality", choices=["draft", "balanced", "quality"], default="balanced")
     parser.add_argument("--duration-seconds", type=float, default=5.0, help="Target clip duration")
@@ -44,6 +45,16 @@ def _parse_args() -> argparse.Namespace:
     parser.add_argument("--seed", type=int, default=-1, help="Seed value (-1 random)")
     parser.add_argument("--image-start", help="Start image path (for i2v/vace)")
     parser.add_argument("--audio-source", help="Optional audio path for audio-conditioned models")
+    parser.add_argument("--music-caption", help="Music caption/style prompt for ACE-Step 1.5 targets")
+    parser.add_argument("--bpm", type=int, help="ACE-Step BPM hint")
+    parser.add_argument("--keyscale", help="ACE-Step key hint, for example 'C major' or 'F# minor'")
+    parser.add_argument("--time-signature", choices=["2", "3", "4", "6", "2/4", "3/4", "4/4", "6/8"], help="ACE-Step meter hint")
+    parser.add_argument("--language", help="ACE-Step ISO language code hint, for example 'en'")
+    parser.add_argument(
+        "--ace-lm-mode",
+        choices=["off", "metadata", "refine-caption", "duration", "full"],
+        help="ACE-Step LM preprocessing mode. Defaults come from the selected model target.",
+    )
     parser.add_argument("--vram-gb", type=float, help="Override detected VRAM")
     parser.add_argument("--output", help="Output JSON file path")
     return parser.parse_args()
@@ -59,6 +70,7 @@ def _max_frames_for_vram(vram_gb: float) -> int:
         return 161
     if vram_gb >= 96:
         return 481
+    # 24GB developer cards can run serious models, but longer clips should be staged.
     return 241
 
 
@@ -116,6 +128,8 @@ def _recommended_runtime_flags(vram_gb: float, quality: str) -> dict[str, Any]:
         return {"attention": "sdpa", "profile": "4", "teacache": 1.5, "compile": False}
     if vram_gb <= 20:
         return {"attention": "sage", "profile": "3", "teacache": 2.0, "compile": True}
+    if vram_gb < 96:
+        return {"attention": "sdpa", "profile": "3", "teacache": 2.0, "compile": False}
     return {"attention": "sage2", "profile": "3", "teacache": 2.0, "compile": True}
 
 
@@ -181,6 +195,9 @@ def _build_catalog_settings(args: argparse.Namespace, vram_gb: float) -> tuple[d
     """Build settings from the curated current-model catalog."""
     model_key = _select_model_key(args, vram_gb)
     target = get_model_target(model_key)
+    if target["family"] == "music":
+        return _build_music_settings(args, target), model_key
+
     resolution = args.resolution
     if resolution == "832x480":
         resolution = str(target["default_resolution"])
@@ -207,6 +224,68 @@ def _build_catalog_settings(args: argparse.Namespace, vram_gb: float) -> tuple[d
         settings["audio_source"] = str(Path(args.audio_source).expanduser().resolve())
         settings.setdefault("audio_prompt_type", "A")
     return settings, model_key
+
+
+def _ace_lm_mode_value(mode: str | None, default: int | None) -> int | None:
+    """Map friendly ACE-Step LM mode names onto WanGP model_mode values."""
+    if mode is None:
+        return default
+    return {
+        "off": 0,
+        "metadata": 1,
+        "refine-caption": 2,
+        "duration": 4,
+        "full": 3,
+    }[mode]
+
+
+def _ace_time_signature_value(value: str) -> int:
+    """Normalize friendly ACE-Step time signatures to WanGP's integer value."""
+    compact = value.strip().replace(" ", "")
+    if "/" in compact:
+        compact = compact.split("/", 1)[0]
+    return int(compact)
+
+
+def _build_music_settings(args: argparse.Namespace, target: dict[str, Any]) -> dict[str, Any]:
+    """Build ACE-Step 1.5 music settings from the curated target."""
+    settings = copy.deepcopy(target["settings"])
+    duration = float(args.duration_seconds)
+    if duration <= 0:
+        duration = float(target.get("default_duration_seconds", 120))
+
+    lm_mode = _ace_lm_mode_value(args.ace_lm_mode, settings.get("model_mode"))
+    if lm_mode is not None:
+        settings["model_mode"] = lm_mode
+
+    custom_settings: dict[str, Any] = {}
+    if args.bpm is not None:
+        custom_settings["bpm"] = args.bpm
+    if args.keyscale:
+        custom_settings["keyscale"] = args.keyscale.strip()
+    if args.time_signature:
+        custom_settings["timesignature"] = _ace_time_signature_value(args.time_signature)
+    if args.language:
+        custom_settings["language"] = args.language.strip().lower()
+
+    settings.update(
+        {
+            "type": "WanGP settings",
+            "prompt": args.prompt.strip(),
+            "alt_prompt": (
+                args.music_caption.strip()
+                if args.music_caption
+                else str(settings.get("alt_prompt", "")).strip()
+            ),
+            "duration_seconds": duration,
+            "num_inference_steps": int(target["default_steps"][args.quality]),
+            "seed": args.seed,
+            "repeat_generation": 1,
+        }
+    )
+    if custom_settings:
+        settings["custom_settings"] = custom_settings
+    return settings
 
 
 def _build_settings(args: argparse.Namespace, vram_gb: float) -> tuple[dict[str, Any], list[str], str]:

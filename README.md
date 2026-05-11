@@ -12,6 +12,9 @@ Wan2GP Operator is an open source CLI operator for WanGP/Wan2GP video generation
 
 Running WanGP directly means fragile prompts, wrong runtime flags, wasted generations, and no consistent troubleshooting loop. Wan2GP Operator adds the missing layer: current model guidance, VRAM-aware compose, headless batch execution, auto-retry, failure diagnosis, learned compatibility state, and a music video pipeline that turns audio tracks into beat-synced AI videos.
 
+Current public releases follow the verified upstream WanGP version. Release
+`v11.61` is the operator release aligned to WanGP `11.61`.
+
 ## Table of Contents
 
 - [What It Does](#what-it-does)
@@ -20,6 +23,7 @@ Running WanGP directly means fragile prompts, wrong runtime flags, wasted genera
 - [Commands](#commands)
 - [AI Music Video Pipeline](#ai-music-video-pipeline)
 - [FAQ](#faq)
+- [Licensing and Models](#licensing-and-models)
 - [Contributing](#contributing)
 - [License](#license)
 
@@ -39,7 +43,7 @@ This is not a GUI wrapper. It is a terminal-first agent control layer that makes
 
 ## Installation
 
-Clone the repository and copy it into your Codex skills directory:
+Clone the repository:
 
 ```bash
 git clone https://github.com/avalonreset/wan2gp-operator.git
@@ -48,16 +52,19 @@ git clone https://github.com/avalonreset/wan2gp-operator.git
 ### As a Codex Skill
 
 ```bash
-# Linux/macOS
-cp -r wan2gp-operator "$HOME/.codex/skills/wan2gp-operator"
+python scripts/install_skill.py --platform codex --scope user
 ```
 
-```powershell
-# Windows
-Copy-Item -Path ".\wan2gp-operator" -Destination "$env:USERPROFILE\.codex\skills\wan2gp-operator" -Recurse -Force
+### As a Claude Skill
+
+```bash
+python scripts/install_skill.py --platform claude --scope user
 ```
 
-Restart Codex after installing. The skill registers on startup.
+Restart Codex or Claude after installing. The installer excludes local
+`runtime/` folders so WanGP clones, venvs, model weights, logs, and generated
+outputs stay in the active project folder instead of being copied into skill
+directories.
 
 ### Prerequisites
 
@@ -73,8 +80,8 @@ Restart Codex after installing. The skill registers on startup.
 # 1. Check hardware readiness
 python scripts/wan2gp_operator.py assess
 
-# 2. Bootstrap Wan2GP installation
-python scripts/wan2gp_operator.py bootstrap
+# 2. Bootstrap Wan2GP installation into ./runtime/Wan2GP
+python scripts/wan2gp_operator.py bootstrap --execute
 
 # 3. Check current model guidance
 python scripts/wan2gp_operator.py models
@@ -90,6 +97,15 @@ python scripts/wan2gp_operator.py compose \
   --model ltx23-dev-22b \
   --quality quality \
   --prompt "cinematic street shot, golden hour, natural city ambience"
+
+# Or generate a high-quality ACE-Step 1.5 song on an RTX 4090
+python scripts/wan2gp_operator.py compose \
+  --task music \
+  --model ace15-xl-lm-4b \
+  --quality quality \
+  --duration-seconds 120 \
+  --prompt "[Verse]\n...\n[Chorus]\n..." \
+  --music-caption "modern cinematic synth-pop, expressive lead vocal, polished mix"
 
 # 5. Dry run first, then execute
 python scripts/wan2gp_operator.py run \
@@ -200,6 +216,12 @@ For high-memory machines, skip tiny demo models unless debugging install health:
 python scripts/wan2gp_operator.py compose --model ltx23-dev-22b --quality quality --prompt "<PROMPT>"
 ```
 
+On RTX 4090/24GB-class development machines, use serious models but start with
+stable runtime flags. The operator's default 24GB path uses LTX-2.3 distilled for
+balanced iteration, `sdpa`, `profile 3`, TeaCache, and no compile until
+Sage/Sage2 is validated locally. Explicit quality tests keep the stable attention
+and profile defaults and can omit TeaCache.
+
 For faster iteration:
 
 ```bash
@@ -211,6 +233,10 @@ Wan2GP Operator wraps WanGP/Wan2GP and adds operational tooling: model selection
 ### Can this generate AI music videos?
 
 Yes. The music video pipeline analyzes your audio track (BPM, beats, sections), generates beat-synced video clips through Wan2GP, retries failed generations automatically, and assembles the final video with ffmpeg. One command or four stages, depending on how much control you want.
+
+### What should I use for ACE-Step 1.5 on an RTX 4090?
+
+Use `ace15-xl-lm-4b` when quality matters. It maps to WanGP's ACE-Step 1.5 XL Turbo 4B DiT plus 4B LM path. Start with 120 seconds at `--quality quality`; 180 seconds is a reasonable stretch target after the first full run succeeds. Use `--music-caption` for genre, arrangement, vocal, and mix direction, and optionally lock `--bpm`, `--keyscale`, `--time-signature`, and `--language`.
 
 ### Does this work with Codex and Claude?
 
@@ -224,6 +250,22 @@ python scripts/install_skill.py --platform claude --scope user
 ### How is this different from ComfyUI?
 
 ComfyUI is a node-based GUI for chaining AI models visually. Wan2GP Operator is a terminal-first CLI that wraps Wan2GP specifically. The tradeoffs: ComfyUI gives you visual flexibility across many models. Wan2GP Operator gives you reproducible, scriptable, headless batch execution with built-in failure diagnosis for Wan2GP specifically.
+
+## Licensing and Models
+
+Wan2GP Operator is released under MIT for this repository's own code and
+documentation. It does not vendor, sublicense, or redistribute WanGP, model
+weights, datasets, LoRAs, generated artifacts, or third-party runtimes.
+
+WanGP/Wan2GP is installed from its upstream repository:
+
+https://github.com/deepbeepmeep/Wan2GP
+
+Models and weights are downloaded by the user's local WanGP installation from
+their upstream providers, the same way they are when using WanGP directly. Those
+materials remain governed by their own licenses, terms, acceptable-use policies,
+and provider requirements. Review `NOTICE.md` before distributing bundles,
+selling services, or using third-party model outputs commercially.
 
 ## Contributing
 
@@ -245,4 +287,6 @@ Join [AI Marketing Hub Pro](https://www.skool.com/ai-marketing-hub-pro/about?ref
 
 ## License
 
-MIT License. See [LICENSE](LICENSE).
+MIT License for this operator's own code and documentation. See
+[LICENSE](LICENSE) and [NOTICE.md](NOTICE.md). WanGP, model weights, datasets,
+LoRAs, and third-party runtimes keep their own upstream licenses and terms.

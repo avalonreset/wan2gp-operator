@@ -3,8 +3,8 @@
 Launch Wan2GP UI from terminal with optional detached mode.
 
 Usage:
-  python scripts/launch_wan2gp.py --wan-root ./Wan2GP
-  python scripts/launch_wan2gp.py --wan-root ./Wan2GP --foreground
+  python scripts/launch_wan2gp.py --wan-root ./runtime/Wan2GP
+  python scripts/launch_wan2gp.py --wan-root ./runtime/Wan2GP --foreground
 """
 
 from __future__ import annotations
@@ -23,7 +23,7 @@ from typing import Any
 def _parse_args() -> argparse.Namespace:
     """Parse CLI args."""
     parser = argparse.ArgumentParser(description="Launch Wan2GP UI")
-    parser.add_argument("--wan-root", default="./Wan2GP", help="Wan2GP root path containing wgp.py")
+    parser.add_argument("--wan-root", default="./runtime/Wan2GP", help="Wan2GP root path containing wgp.py")
     parser.add_argument("--env-manager", choices=["auto", "conda", "venv", "none"], default="auto")
     parser.add_argument("--env-name", default="wan2gp", help="Conda env name or venv folder name")
     parser.add_argument("--server-port", type=int, default=7860, help="Wan2GP web server port")

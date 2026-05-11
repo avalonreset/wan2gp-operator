@@ -70,6 +70,23 @@ def main() -> int:
             ".codex",
             ".claude",
             ".gemini",
+            ".github-audit",
+            "runtime",
+            "outputs",
+            "logs",
+            "settings",
+            "renders",
+            "models",
+            "*.safetensors",
+            "*.ckpt",
+            "*.pt",
+            "*.pth",
+            "*.gguf",
+            "*.onnx",
+            "*.mp4",
+            "*.mov",
+            "*.wav",
+            "*.mp3",
         )
         shutil.copytree(source, destination, ignore=ignore)
 

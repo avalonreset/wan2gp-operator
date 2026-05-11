@@ -4,7 +4,7 @@ Generate or execute a Wan2GP setup plan.
 
 Usage:
   python scripts/setup_wan2gp.py
-  python scripts/setup_wan2gp.py --target-dir E:/tools/Wan2GP --execute
+  python scripts/setup_wan2gp.py --target-dir ./runtime/Wan2GP --execute
 """
 
 from __future__ import annotations
@@ -66,7 +66,7 @@ def _resolve_env_manager(env_manager: str) -> str:
 def _parse_args() -> argparse.Namespace:
     """Parse CLI args."""
     parser = argparse.ArgumentParser(description="Plan or execute Wan2GP setup")
-    parser.add_argument("--target-dir", default="./Wan2GP", help="Destination directory for Wan2GP repo")
+    parser.add_argument("--target-dir", default="./runtime/Wan2GP", help="Destination directory for Wan2GP repo")
     parser.add_argument("--repo", default="https://github.com/deepbeepmeep/Wan2GP.git", help="Wan2GP git URL")
     parser.add_argument("--branch", default="main", help="Git branch to use")
     parser.add_argument("--env-manager", choices=["auto", "conda", "venv", "none"], default="auto")
@@ -105,13 +105,13 @@ def _build_plan(
                     ),
                 },
                 {
-                    "step": "install_torch",
-                    "cmd": f'conda run -n {env_name} {torch_info["cmd"]}',
-                },
-                {
                     "step": "install_requirements",
                     "cmd": f"conda run -n {env_name} pip install -r requirements.txt",
                     "cwd": str(target),
+                },
+                {
+                    "step": "install_torch",
+                    "cmd": f'conda run -n {env_name} {torch_info["cmd"]}',
                 },
                 {
                     "step": "verify",
@@ -136,13 +136,13 @@ def _build_plan(
                     ),
                 },
                 {
-                    "step": "install_torch",
-                    "cmd": f'"{python_exe}" -m pip install --upgrade pip && {pip_torch_cmd}',
+                    "step": "install_requirements",
+                    "cmd": f'"{python_exe}" -m pip install --upgrade pip && "{python_exe}" -m pip install -r requirements.txt',
+                    "cwd": str(target),
                 },
                 {
-                    "step": "install_requirements",
-                    "cmd": f'"{python_exe}" -m pip install -r requirements.txt',
-                    "cwd": str(target),
+                    "step": "install_torch",
+                    "cmd": pip_torch_cmd,
                 },
                 {
                     "step": "verify",

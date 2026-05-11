@@ -12,6 +12,7 @@ from __future__ import annotations
 import argparse
 import json
 import re
+import subprocess
 import sys
 from pathlib import Path
 from typing import Any
@@ -35,9 +36,71 @@ def _fetch_json(url: str) -> Any:
         return json.loads(response.read().decode("utf-8"))
 
 
+def _fetch_text(url: str) -> str:
+    """Fetch plain text from a URL."""
+    request = Request(url, headers={"User-Agent": "wan2gp-operator"})
+    with urlopen(request, timeout=20) as response:
+        return response.read().decode("utf-8", errors="replace")
+
+
+def _git_ls_remote_main(repo: str) -> str | None:
+    """Fetch main branch SHA without relying on the GitHub REST API."""
+    url = f"https://github.com/{repo}.git"
+    try:
+        process = subprocess.run(
+            ["git", "ls-remote", url, "refs/heads/main"],
+            text=True,
+            capture_output=True,
+            timeout=30,
+            check=False,
+        )
+    except (OSError, subprocess.SubprocessError):
+        return None
+    if process.returncode != 0:
+        return None
+    first = process.stdout.strip().split()
+    return first[0] if first else None
+
+
+def _fetch_readme_version(repo: str, api_warning: str | None = None) -> dict[str, Any]:
+    """Fallback to README version scraping plus git remote commit state."""
+    latest_commit = _git_ls_remote_main(repo)
+    readme_url = f"https://raw.githubusercontent.com/{repo}/main/README.md"
+    readme_text = _fetch_text(readme_url)
+    match = re.search(r"WanGP\s+v?(\d+(?:\.\d+)*)", readme_text, flags=re.IGNORECASE)
+    if not match:
+        raise RuntimeError("No releases, tags, or detectable README version found for repository.")
+
+    version = match.group(1)
+    section_lines: list[str] = []
+    lines = readme_text.splitlines()
+    start_idx = None
+    for i, line in enumerate(lines):
+        if "latest updates" in line.lower():
+            start_idx = i
+            break
+    if start_idx is not None:
+        for line in lines[start_idx + 1 :]:
+            if line.startswith("## ") and section_lines:
+                break
+            section_lines.append(line)
+    section_text = "\n".join(section_lines[:220]).strip()
+
+    return {
+        "version": version,
+        "published_at": None,
+        "url": f"https://github.com/{repo}",
+        "body": section_text,
+        "source": "readme+git",
+        "commit": latest_commit,
+        "warning": api_warning,
+    }
+
+
 def _fetch_latest_release(repo: str) -> dict[str, Any]:
     """Fetch latest GitHub release metadata, with tag fallback."""
     release_url = f"https://api.github.com/repos/{repo}/releases/latest"
+    api_warning = None
     try:
         release = _fetch_json(release_url)
         return {
@@ -49,11 +112,16 @@ def _fetch_latest_release(repo: str) -> dict[str, Any]:
         }
     except HTTPError as exc:
         if exc.code != 404:
-            raise
+            api_warning = f"GitHub REST API unavailable ({exc}); used raw README and git remote fallback."
+            return _fetch_readme_version(repo, api_warning)
 
     # Fallback to tags when no formal release exists.
     tags_url = f"https://api.github.com/repos/{repo}/tags"
-    tags = _fetch_json(tags_url)
+    try:
+        tags = _fetch_json(tags_url)
+    except HTTPError as exc:
+        api_warning = f"GitHub REST API unavailable ({exc}); used raw README and git remote fallback."
+        return _fetch_readme_version(repo, api_warning)
     if isinstance(tags, list) and tags:
         top = tags[0]
         return {
@@ -64,52 +132,7 @@ def _fetch_latest_release(repo: str) -> dict[str, Any]:
             "source": "tag",
         }
 
-    # Fallback to README version scraping for repos that publish updates there.
-    commits_url = f"https://api.github.com/repos/{repo}/commits/main"
-    latest_commit = None
-    latest_commit_date = None
-    try:
-        commit = _fetch_json(commits_url)
-        latest_commit = commit.get("sha")
-        latest_commit_date = (
-            commit.get("commit", {}).get("committer", {}).get("date")
-            if isinstance(commit, dict)
-            else None
-        )
-    except Exception:
-        latest_commit = None
-
-    readme_url = f"https://raw.githubusercontent.com/{repo}/main/README.md"
-    request = Request(readme_url, headers={"User-Agent": "wan2gp-operator"})
-    with urlopen(request, timeout=20) as response:
-        readme_text = response.read().decode("utf-8", errors="replace")
-    match = re.search(r"WanGP\s+v?(\d+(?:\.\d+)*)", readme_text, flags=re.IGNORECASE)
-    if match:
-        version = match.group(1)
-        section_lines: list[str] = []
-        lines = readme_text.splitlines()
-        start_idx = None
-        for i, line in enumerate(lines):
-            if "latest updates" in line.lower():
-                start_idx = i
-                break
-        if start_idx is not None:
-            for line in lines[start_idx + 1 :]:
-                if line.startswith("## ") and section_lines:
-                    break
-                section_lines.append(line)
-        section_text = "\n".join(section_lines[:220]).strip()
-
-        return {
-            "version": version,
-            "published_at": latest_commit_date,
-            "url": f"https://github.com/{repo}",
-            "body": section_text,
-            "source": "readme",
-            "commit": latest_commit,
-        }
-
-    raise RuntimeError("No releases, tags, or detectable README version found for repository.")
+    return _fetch_readme_version(repo, api_warning)
 
 
 def _extract_local_version(wan_root: Path) -> str | None:
@@ -120,6 +143,23 @@ def _extract_local_version(wan_root: Path) -> str | None:
     content = wgp_file.read_text(encoding="utf-8", errors="replace")
     match = re.search(r'WanGP_version\s*=\s*"([^"]+)"', content)
     return match.group(1) if match else None
+
+
+def _extract_local_commit(wan_root: Path) -> str | None:
+    """Extract current git commit from a WanGP checkout."""
+    try:
+        process = subprocess.run(
+            ["git", "-C", str(wan_root), "rev-parse", "HEAD"],
+            text=True,
+            capture_output=True,
+            timeout=15,
+            check=False,
+        )
+    except (OSError, subprocess.SubprocessError):
+        return None
+    if process.returncode != 0:
+        return None
+    return process.stdout.strip() or None
 
 
 def _version_tuple(version_str: str | None) -> tuple[int, ...]:
@@ -170,7 +210,9 @@ def main() -> int:
     highlights = _normalize_lines(remote_body, args.max_highlights)
 
     local_version = None
+    local_commit = None
     update_available = None
+    commit_update_available = None
     local_root = None
     local_warning = None
     if args.wan_root:
@@ -179,7 +221,11 @@ def main() -> int:
             local_warning = "Provided --wan-root does not look like a Wan2GP root (missing wgp.py)."
         else:
             local_version = _extract_local_version(local_root)
+            local_commit = _extract_local_commit(local_root)
             update_available = _version_tuple(remote_version) > _version_tuple(local_version)
+            remote_commit = latest.get("commit")
+            if remote_commit and local_commit:
+                commit_update_available = remote_commit != local_commit
 
     report: dict[str, Any] = {
         "status": "success",
@@ -190,17 +236,20 @@ def main() -> int:
             "url": remote_url,
             "source": latest["source"],
             "commit": latest.get("commit"),
+            "warning": latest.get("warning"),
         },
         "highlights": highlights,
         "local": {
             "wan_root": str(local_root) if local_root else None,
             "version": local_version,
+            "commit": local_commit,
             "update_available": update_available,
+            "commit_update_available": commit_update_available,
             "warning": local_warning,
         },
     }
 
-    if local_root and update_available and not local_warning:
+    if local_root and (update_available or commit_update_available) and not local_warning:
         report["suggested_update_commands"] = [
             f'git -C "{local_root}" pull --ff-only',
             f'pip install -r "{local_root}\\requirements.txt"',

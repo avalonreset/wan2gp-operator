@@ -21,3 +21,9 @@ flags.
 
 Hardware tiers should change recommendations. A 128GB machine should not receive
 the same defaults as a 12GB or 24GB machine.
+
+## 24GB Developer Tier
+
+RTX 4090-class cards are a distinct tier. They should get serious model targets,
+not tiny demos, but their default runtime flags should stay stable until local
+attention backend compatibility is known.

@@ -41,6 +41,8 @@ Commands:
 - Do not claim update status without running `wan2gp_operator.py updates`.
 - Do not recommend tiny demo models on high-memory machines unless debugging install health.
 - Use `wan2gp_operator.py models` before making "best current model" recommendations.
+- Keep local WanGP installs under `runtime/Wan2GP` by default; do not scatter
+  clones, venvs, logs, or model state into unrelated folders.
 
 ## Development Wiki
 

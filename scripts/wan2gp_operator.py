@@ -5,12 +5,12 @@ Unified Wan2GP Operator entrypoint for Codex workflows.
 Usage:
   python scripts/wan2gp_operator.py bootstrap --execute --launch-ui
   python scripts/wan2gp_operator.py assess
-  python scripts/wan2gp_operator.py setup --target-dir E:/tools/Wan2GP
-  python scripts/wan2gp_operator.py launch-ui --wan-root E:/tools/Wan2GP
+  python scripts/wan2gp_operator.py setup --target-dir ./runtime/Wan2GP
+  python scripts/wan2gp_operator.py launch-ui --wan-root ./runtime/Wan2GP
   python scripts/wan2gp_operator.py compose --prompt "cinematic city timelapse"
   python scripts/wan2gp_operator.py models
-  python scripts/wan2gp_operator.py run --wan-root E:/tools/Wan2GP --process ./job.json --dry-run
-  python scripts/wan2gp_operator.py evolve --wan-root E:/tools/Wan2GP
+  python scripts/wan2gp_operator.py run --wan-root ./runtime/Wan2GP --process ./job.json --dry-run
+  python scripts/wan2gp_operator.py evolve --wan-root ./runtime/Wan2GP
 """
 
 from __future__ import annotations

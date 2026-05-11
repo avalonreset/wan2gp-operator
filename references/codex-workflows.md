@@ -13,15 +13,15 @@ python scripts/wan2gp_operator.py bootstrap --execute --launch-ui
 
 ```bash
 python scripts/wan2gp_operator.py compose --prompt "cinematic product reveal in rain" --duration-seconds 6 --quality balanced
-python scripts/wan2gp_operator.py run --wan-root E:\tools\Wan2GP --process <generated-settings.json> --dry-run
-python scripts/wan2gp_operator.py run --wan-root E:\tools\Wan2GP --process <generated-settings.json> --log-file logs\wan2gp.log
+python scripts/wan2gp_operator.py run --wan-root .\runtime\Wan2GP --process <generated-settings.json> --dry-run
+python scripts/wan2gp_operator.py run --wan-root .\runtime\Wan2GP --process <generated-settings.json> --log-file runtime\logs\wan2gp.log
 ```
 
 ## C. Queue Processing
 
 ```bash
-python scripts/wan2gp_operator.py run --wan-root E:\tools\Wan2GP --process overnight_queue.zip --output-dir E:\renders --dry-run
-python scripts/wan2gp_operator.py run --wan-root E:\tools\Wan2GP --process overnight_queue.zip --output-dir E:\renders --log-file logs\overnight.log
+python scripts/wan2gp_operator.py run --wan-root .\runtime\Wan2GP --process overnight_queue.zip --output-dir .\runtime\renders --dry-run
+python scripts/wan2gp_operator.py run --wan-root .\runtime\Wan2GP --process overnight_queue.zip --output-dir .\runtime\renders --log-file runtime\logs\overnight.log
 ```
 
 ## D. Failure Recovery
@@ -38,17 +38,17 @@ Then rerun with safer flags:
 ## E. Update Intelligence
 
 ```bash
-python scripts/wan2gp_operator.py updates --wan-root E:\tools\Wan2GP
+python scripts/wan2gp_operator.py updates --wan-root .\runtime\Wan2GP
 ```
 
 ## F. Recursive Improvement Loop
 
 ```bash
-python scripts/wan2gp_operator.py run --wan-root E:\tools\Wan2GP --process <job.json> --log-file logs\run.log
-python scripts/wan2gp_operator.py evolve --wan-root E:\tools\Wan2GP --log-file logs\run.log
+python scripts/wan2gp_operator.py run --wan-root .\runtime\Wan2GP --process <job.json> --log-file runtime\logs\run.log
+python scripts/wan2gp_operator.py evolve --wan-root .\runtime\Wan2GP --log-file runtime\logs\run.log
 ```
 
 Notes:
 - `run` auto-retries once for known argument incompatibilities (for example `--teacache`).
-- Learned state is persisted in `E:\tools\Wan2GP\.wan2gp_operator_state.json`.
+- Learned state is persisted in `.\runtime\Wan2GP\.wan2gp_operator_state.json`.
 

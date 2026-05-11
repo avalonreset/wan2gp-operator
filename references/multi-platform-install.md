@@ -26,5 +26,11 @@ python scripts/install_skill.py --platform gemini --scope project --project-root
 ## Paths Used
 
 - Claude: `~/.claude/skills/wan2gp-operator` or `<project>/.claude/skills/wan2gp-operator`
-- Codex: `~/.agents/skills/wan2gp-operator` or `<project>/.agents/skills/wan2gp-operator`
+- Codex: `~/.codex/skills/wan2gp-operator` or `<project>/.codex/skills/wan2gp-operator`
 - Gemini: `~/.gemini/skills/wan2gp-operator` or `<project>/.gemini/skills/wan2gp-operator`
+
+## Runtime Boundary
+
+Skill installs intentionally exclude `runtime/`, `logs/`, `outputs/`, and
+`settings/`. WanGP itself should be installed by the operator into the active
+project's `runtime/Wan2GP` folder, not copied into agent skill directories.

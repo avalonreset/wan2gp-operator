@@ -20,6 +20,8 @@ related:
 
 ## Current Targets
 
+- `ace15-xl-lm-4b`
+- `ace15-xl-lm-1-7b`
 - `ltx23-dev-22b`
 - `ltx23-distilled-22b`
 - `wan22-t2v-14b`

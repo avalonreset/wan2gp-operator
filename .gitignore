@@ -8,6 +8,22 @@ Thumbs.db
 
 .github-audit/
 
+# Local WanGP installs, symlinks, model weights, logs, and generated media.
+runtime/
+logs/
+outputs/
+settings/
+renders/
+models/
+loras/
+finetunes/
+*.safetensors
+*.ckpt
+*.pt
+*.pth
+*.gguf
+*.onnx
+
 # Obsidian vault UI state
 obsidian-wiki/.obsidian/workspace.json
 obsidian-wiki/.obsidian/workspace-mobile.json

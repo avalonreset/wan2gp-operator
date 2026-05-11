@@ -89,13 +89,25 @@ def recommend_from_vram(max_vram_gb: float) -> dict[str, Any]:
             "compile": True,
             "rationale": "Higher throughput profile for mid/high VRAM cards.",
         }
+    if max_vram_gb < 96:
+        return {
+            "model_preset": "ltx23-distilled-22b",
+            "attention": "sdpa",
+            "profile": "3",
+            "teacache": 2.0,
+            "compile": False,
+            "rationale": (
+                "RTX 4090/24GB-class developer profile: use serious 22B targets, "
+                "but keep runtime flags stable until Sage/Sage2 is proven locally."
+            ),
+        }
     return {
-        "model_preset": "t2v-14B",
+        "model_preset": "ltx23-dev-22b",
         "attention": "sage2",
         "profile": "3",
-        "teacache": 2.0,
+        "teacache": None,
         "compile": True,
-        "rationale": "Aggressive profile for 24GB+ class hardware.",
+        "rationale": "Aggressive profile for 96GB+ high-memory proof runs.",
     }
 
 

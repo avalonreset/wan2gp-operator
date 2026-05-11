@@ -11,6 +11,8 @@ path: "scripts/music_video.py"
 language: python
 related:
   - "[[Music Video Pipeline Flow]]"
+  - "[[Automated Beat Editing Rubric]]"
+  - "[[ACE-Step 1.5]]"
 ---
 
 # Music Video Pipeline
@@ -30,3 +32,8 @@ plan, generates clips through WanGP, and assembles the final output with FFmpeg.
 
 `v0.5.1` made curated model targets flow through this pipeline so high-memory or
 LTX-2.3 targets are not silently forced back into legacy Wan 2.2 behavior.
+
+## Next Upgrade
+
+The next milestone should add a generated-song input path through [[ACE-Step 1.5]]
+and replace simple beat-aligned shot planning with the [[Automated Beat Editing Rubric]].

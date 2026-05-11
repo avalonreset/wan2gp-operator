@@ -2,10 +2,29 @@
 
 All notable changes to this project will be documented in this file.
 
-The format is based on [Keep a Changelog](https://keepachangelog.com/),
-and this project adheres to [Semantic Versioning](https://semver.org/).
+The format is based on [Keep a Changelog](https://keepachangelog.com/).
+Public release numbers follow the verified upstream WanGP version.
 
 ## [Unreleased]
+
+## [11.61] - 2026-05-10
+
+### Added
+- Added ACE-Step 1.5 XL music targets to the curated model catalog, including `ace15-xl-lm-4b` for RTX 4090-class quality song generation.
+- `compose --task music` can now generate ACE-Step settings with music captions, duration, BPM, key, time signature, language, and LM preprocessing mode controls.
+
+### Changed
+- Release versioning now matches the verified upstream WanGP version; this release is aligned to WanGP `11.61`.
+- Default WanGP setup path is now `./runtime/Wan2GP` so clones, venvs, logs, and generated state stay under one project runtime folder.
+- Setup now installs WanGP requirements first, then applies the selected CUDA Torch stack last so requirements cannot silently replace CUDA Torch with CPU Torch.
+- Added an RTX 4090/24GB developer tier so the operator uses serious LTX/Wan targets without inheriting the 96GB+ `sage2`/compile high-memory defaults.
+- Skill installs now exclude `runtime/`, `logs/`, `outputs/`, and `settings/` to keep Codex and Claude skill directories clean.
+- Update checks now fall back to raw README plus `git ls-remote` when the GitHub REST API is rate-limited.
+
+### Verified
+- Local WanGP root `E:\wan2gp-operator\runtime\Wan2GP` reports WanGP `11.61` at upstream commit `8387f64fe829fb0accf9d13fac65d34a25f5fc1f`.
+- RTX 4090 runtime venv reports CUDA Torch: `torch 2.10.0+cu130`, `torchvision 0.25.0+cu130`, `torchaudio 2.10.0+cu130`.
+- ACE-Step 1.5 XL 4B music settings dry-run passed against the active local WanGP runtime.
 
 ## [0.5.3] - 2026-05-10
 
@@ -93,7 +112,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 - Bootstrap, compose, run, diagnose, updates, evolve workflows
 - Codex-first skill contract and references
 
-[Unreleased]: https://github.com/avalonreset/wan2gp-operator/compare/v0.5.0...HEAD
+[Unreleased]: https://github.com/avalonreset/wan2gp-operator/compare/v11.61...HEAD
+[11.61]: https://github.com/avalonreset/wan2gp-operator/compare/v0.5.3...v11.61
 [0.5.0]: https://github.com/avalonreset/wan2gp-operator/compare/v0.4.0...v0.5.0
 [0.4.0]: https://github.com/avalonreset/wan2gp-operator/compare/v0.3.0...v0.4.0
 [0.3.0]: https://github.com/avalonreset/wan2gp-operator/compare/v0.2.0...v0.3.0

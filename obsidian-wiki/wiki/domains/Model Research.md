@@ -9,6 +9,7 @@ tags:
   - research
 status: active
 related:
+  - "[[RTX 4090]]"
   - "[[Wan 2.2 A14B]]"
   - "[[LTX-2.3 Dev 22B]]"
   - "[[Curated Model Targets]]"
@@ -22,6 +23,7 @@ This domain tracks model recommendations and how they map into WanGP settings.
 
 - [[Wan 2.2 A14B]] is the clearest 128GB proof target because the full 720p path is memory hungry enough to justify the hardware.
 - [[LTX-2.3 Dev 22B]] is the current creative quality target for long-coherence and audio-video experimentation.
+- [[RTX 4090]] development should use LTX-2.3 distilled for iteration and explicit short LTX-2.3 dev quality tests, but keep stable runtime flags until Sage/Sage2 is locally proven.
 - Tiny models remain useful only for installation sanity checks on high-memory machines.
 
 > [!stale] Time-sensitive guidance

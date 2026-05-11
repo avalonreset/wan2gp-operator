@@ -101,7 +101,12 @@ def _build_recommendation(gpu_report: dict[str, Any], system_info: SystemInfo) -
         blockers.append(f"Free disk ({system_info.free_disk_gb}GB) is too low for model downloads and outputs.")
 
     if not blockers:
-        if max_vram_gb >= 12 and system_info.total_ram_gb >= 32 and system_info.free_disk_gb >= 150:
+        required_free_disk_gb = 120 if max_vram_gb >= 24 else 150
+        if (
+            max_vram_gb >= 12
+            and system_info.total_ram_gb >= 32
+            and system_info.free_disk_gb >= required_free_disk_gb
+        ):
             verdict = "recommended"
         else:
             verdict = "possible_with_constraints"
@@ -117,8 +122,16 @@ def _build_recommendation(gpu_report: dict[str, Any], system_info: SystemInfo) -
         model_advice.append("Start with t2v-1-3B and profile 4.")
     elif max_vram_gb <= 12:
         model_advice.append("Use t2v-14B with profile 4; drop to 1.3B if unstable.")
+    elif max_vram_gb < 24:
+        model_advice.append("Use LTX-2.3 distilled 22B or Wan 2.2 14B with profile 3.")
+    elif max_vram_gb < 96:
+        model_advice.append(
+            "Use the RTX 4090 developer path: LTX-2.3 distilled for iteration, "
+            "explicit LTX-2.3 dev quality tests after dry-run, and sdpa/profile 3 "
+            "until Sage/Sage2 is proven locally."
+        )
     else:
-        model_advice.append("Use t2v-14B; consider Sage/Sage2 once dependencies are stable.")
+        model_advice.append("Use LTX-2.3 dev 22B and Wan 2.2 A14B high-memory proof runs.")
 
     return {
         "verdict": verdict,

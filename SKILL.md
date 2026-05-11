@@ -43,7 +43,7 @@ One-command from-scratch install + launch:
 python scripts/wan2gp_operator.py bootstrap --execute --launch-ui
 ```
 
-Manual setup plan (defaults to `./Wan2GP` if path omitted):
+Manual setup plan (defaults to `./runtime/Wan2GP` if path omitted):
 ```bash
 python scripts/wan2gp_operator.py setup
 python scripts/wan2gp_operator.py setup --execute
@@ -133,7 +133,8 @@ python scripts/wan2gp_operator.py models --wan-root <WAN2GP_ROOT>
 ```
 
 As of 2026-05-10, use LTX-2.3 22B as the hot general open-source audio-video
-target and Wan 2.2 14B as the strongest Wan-family workhorse inside WanGP.
+target, ACE-Step 1.5 XL LM 4B as the high-quality local music target, and
+Wan 2.2 14B as the strongest Wan-family workhorse inside WanGP.
 
 ### Step 9: Evolve Capability State
 

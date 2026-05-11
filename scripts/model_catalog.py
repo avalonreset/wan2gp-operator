@@ -13,6 +13,80 @@ from typing import Any
 
 
 MODEL_TARGETS: dict[str, dict[str, Any]] = {
+    "ace15-xl-lm-4b": {
+        "label": "ACE-Step 1.5 XL Turbo LM 4B",
+        "model_type": "ace_step_v1_5_xl",
+        "family": "music",
+        "why": "Highest-quality ACE-Step 1.5 path currently exposed by WanGP: XL 4B DiT plus strongest 4B LM preprocessing.",
+        "min_vram_gb": 24,
+        "default_duration_seconds": 120,
+        "reasonable_duration_seconds": 180,
+        "default_steps": {"draft": 8, "balanced": 12, "quality": 16},
+        "settings": {
+            "type": "WanGP settings",
+            "model_type": "ace_step_v1_5_xl",
+            "base_model_type": "ace_step_v1_5_xl",
+            "model_mode": 3,
+            "model": {
+                "name": "TTS ACE-Step v1.5 XL Turbo LM_4B 4B",
+                "architecture": "ace_step_v1_5_xl",
+                "description": (
+                    "ACE-Step 1.5 XL Turbo with the 4B XL DiT and 4B 5Hz LM path "
+                    "for maximum quality and lyric matching in WanGP."
+                ),
+                "URLs": "ace_step_v1_5_xl",
+                "text_encoder_URLs": [
+                    "https://huggingface.co/DeepBeepMeep/TTS/resolve/main/acestep-5Hz-lm-4B/acestep-5Hz-lm-4B_bf16.safetensors",
+                    "https://huggingface.co/DeepBeepMeep/TTS/resolve/main/acestep-5Hz-lm-4B/acestep-5Hz-lm-4B_quanto_bf16_int8.safetensors",
+                ],
+                "ace_step15_transformer_variant": "xl_turbo",
+                "text_encoder_folder": "acestep-5Hz-lm-4B",
+            },
+            "alt_prompt": "high-fidelity modern song production, expressive vocals, polished mix",
+            "audio_prompt_type": "",
+            "audio_scale": 0.5,
+            "shift": 1.0,
+            "guidance_scale": 1.0,
+            "scheduler_type": "euler",
+        },
+    },
+    "ace15-xl-lm-1-7b": {
+        "label": "ACE-Step 1.5 XL Turbo LM 1.7B",
+        "model_type": "ace_step_v1_5_xl",
+        "family": "music",
+        "why": "Quality ACE-Step 1.5 XL target with strong lyric control and lower LM overhead than the 4B LM path.",
+        "min_vram_gb": 16,
+        "default_duration_seconds": 120,
+        "reasonable_duration_seconds": 180,
+        "default_steps": {"draft": 8, "balanced": 8, "quality": 12},
+        "settings": {
+            "type": "WanGP settings",
+            "model_type": "ace_step_v1_5_xl",
+            "base_model_type": "ace_step_v1_5_xl",
+            "model_mode": 2,
+            "model": {
+                "name": "TTS ACE-Step v1.5 XL Turbo LM_1.7B 4B",
+                "architecture": "ace_step_v1_5_xl",
+                "description": (
+                    "ACE-Step 1.5 XL Turbo with the 4B XL DiT and 1.7B 5Hz LM "
+                    "for high-quality local song generation in WanGP."
+                ),
+                "URLs": "ace_step_v1_5_xl",
+                "text_encoder_URLs": [
+                    "https://huggingface.co/DeepBeepMeep/TTS/resolve/main/acestep-5Hz-lm-1.7B/acestep-5Hz-lm-1.7B_bf16.safetensors",
+                    "https://huggingface.co/DeepBeepMeep/TTS/resolve/main/acestep-5Hz-lm-1.7B/acestep-5Hz-lm-1.7B_quanto_bf16_int8.safetensors",
+                ],
+                "ace_step15_transformer_variant": "xl_turbo",
+                "text_encoder_folder": "acestep-5Hz-lm-1.7B",
+            },
+            "alt_prompt": "high-fidelity modern song production, expressive vocals, polished mix",
+            "audio_prompt_type": "",
+            "audio_scale": 0.5,
+            "shift": 1.0,
+            "guidance_scale": 1.0,
+            "scheduler_type": "euler",
+        },
+    },
     "wan22-t2v-14b": {
         "label": "Wan 2.2 Text-to-Video 14B",
         "model_type": "t2v_2_2",
@@ -174,6 +248,10 @@ def get_model_target(key: str) -> dict[str, Any]:
 
 def auto_model_key(task: str, has_image: bool, vram_gb: float, quality: str) -> str:
     """Pick a model key from intent, hardware, and quality."""
+    if task == "music":
+        if vram_gb >= 24 and quality == "quality":
+            return "ace15-xl-lm-4b"
+        return "ace15-xl-lm-1-7b"
     if task == "vace":
         return "wan22-i2v-14b" if has_image else "wan22-t2v-14b"
     if task == "i2v" or has_image:
